@@ -11,5 +11,6 @@ create table if not exists components (
   min_stock integer default 0,
   updated_at timestamptz default now()
 );
--- Uso personal: acceso abierto con la clave anon (se puede restringir después)
-alter table components disable row level security;
+-- Uso personal con clave pública: RLS activado + acceso total anon
+create policy "Acceso total anon (uso personal)"
+on components for all to anon using (true) with check (true);
