@@ -325,7 +325,7 @@ async function wikiLookup(term, box) {
     s.textContent = 'Sin conexión a Wikipedia (revisá internet). Igual podés cargarlo manual.';
   }
 }
-ENDC1
+FINC1
 ['f-name', 'f-sku', 'f-val', 'f-spec'].forEach((id) => $(id).addEventListener('input', (e) => {
   if (id === 'f-val' || id === 'f-spec') aiAuto = false; // edición manual rompe lo auto
   if (id === 'f-sku') skuAuto = false;
