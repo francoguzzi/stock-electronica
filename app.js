@@ -12,6 +12,7 @@ const CFG_KEY = 'stock_cfg_v1';
 // activá RLS + rotá claves si la app se vuelve pública.
 const SB_DEFAULTS = { url: 'https://lpztroezuksyiuptzdec.supabase.co', key: 'sb_publishable_x-N8dCh5JlMiTu8njyV0Og_3ku3tYVd' };
 let SB = null, cloudOk = false, MEM = null; // MEM = caché en memoria; en modo nube NO se usa localStorage
+let RT = null; // canal realtime (cambios instantáneos entre dispositivos)
 const getCfg = () => { try { return Object.assign({}, SB_DEFAULTS, JSON.parse(localStorage.getItem(CFG_KEY)) || {}); } catch { return Object.assign({}, SB_DEFAULTS); } };
 const setCfg = (c) => localStorage.setItem(CFG_KEY, JSON.stringify(c));
 const toRow = (c) => ({ sku: c.sku, name: c.name, cat: c.cat || '', loc: c.loc || '', val: c.val || '', spec: c.spec || '', descr: c.desc || '', qty: c.qty || 0, min_stock: c.min || 0 });
@@ -42,6 +43,7 @@ async function cloudConnect(silent) {
     const { error } = await SB.from('components').select('sku', { count: 'exact', head: true });
     if (error) throw error;
     cloudOk = true;
+    rtStart();
     if (!silent) cloudStatus('Conectado. Tocá Sincronizar para traer/subir.');
     return true;
   } catch (e) {
@@ -49,6 +51,17 @@ async function cloudConnect(silent) {
     return false;
   }
 }
+// Realtime: la nube avisa cada cambio y se trae solo (con polling de respaldo)
+function rtStart() {
+  try {
+    if (RT && SB) SB.removeChannel(RT);
+    RT = null;
+    RT = SB.channel('stock-components')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'components' }, () => { cloudPull(); })
+      .subscribe();
+  } catch {}
+}
+function rtStop() { try { if (RT && SB) SB.removeChannel(RT); } catch {} RT = null; }
 async function cloudPull() {
   if (!cloudOk && !(await cloudConnect(true))) { cloudStatus('Sin nube: trabajo local.'); return; }
   try {
@@ -325,6 +338,7 @@ async function wikiLookup(term, box) {
     s.textContent = 'Sin conexión a Wikipedia (revisá internet). Igual podés cargarlo manual.';
   }
 }
+
 ['f-name', 'f-sku', 'f-val', 'f-spec'].forEach((id) => $(id).addEventListener('input', (e) => {
   if (id === 'f-val' || id === 'f-spec') aiAuto = false; // edición manual rompe lo auto
   if (id === 'f-sku') skuAuto = false;
