@@ -58,6 +58,7 @@ function rtStart() {
     RT = null;
     RT = SB.channel('stock-components')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'components' }, () => { cloudPull(); })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'deleted_skus' }, () => { cloudPull(); })
       .subscribe();
   } catch {}
 }
@@ -65,11 +66,14 @@ function rtStop() { try { if (RT && SB) SB.removeChannel(RT); } catch {} RT = nu
 async function cloudPull() {
   if (!cloudOk && !(await cloudConnect(true))) { cloudStatus('Sin nube: trabajo local.'); return; }
   try {
-    const { data, error } = await SB.from('components').select('*');
-    if (error) throw error;
-    const rows = (data || []).map(fromRow);
+    const got = await SB.from('components').select('*');
+    const tbs = await SB.from('deleted_skus').select('sku');
+    if (got.error) throw got.error;
+    if (tbs.error) throw tbs.error;
+    const tombs = new Set((tbs.data || []).map((x) => x.sku));
+    const rows = (got.data || []).map(fromRow).filter((x) => !tombs.has(x.sku));
     const bySku = new Map(rows.map((r) => [r.sku, r]));
-    const base = (MEM && MEM.length ? MEM : loadLocal());
+    const base = (MEM && MEM.length ? MEM : loadLocal()).filter((m) => !tombs.has(m.sku));
     const merged = [];
     const missing = [];
     for (const m of base) {
@@ -86,6 +90,16 @@ async function cloudPull() {
     } else cloudStatus('Sincronizado: ' + MEM.length + ' componentes.');
   } catch (e) { cloudStatus('Falló sincronizar: ' + (e.message || e) + ' — revisá tabla y RLS (supabase.sql).'); }
 }
+async function cloudTombstone(sku, remove) {
+  if (!cloudOk) return true;
+  try {
+    const res = remove
+      ? await SB.from('deleted_skus').delete().eq('sku', sku)
+      : await SB.from('deleted_skus').upsert({ sku }, { onConflict: 'sku' });
+    if (res.error) throw res.error;
+    return true;
+  } catch (e) { cloudStatus('Fallo lápida (' + (e.message || e) + ').'); return false; }
+}
 async function cloudPush(item) {
   if (!cloudOk) return;
   try {
@@ -96,8 +110,10 @@ async function cloudPush(item) {
 async function cloudDel(sku) {
   if (!cloudOk) return true;
   try {
-    const { error } = await SB.from('components').delete().eq('sku', sku);
-    if (error) throw error;
+    const { error: e1 } = await SB.from('deleted_skus').upsert({ sku }, { onConflict: 'sku' });
+    if (e1) throw e1;
+    const { error: e2 } = await SB.from('components').delete().eq('sku', sku);
+    if (e2) throw e2;
     return true;
   } catch (e) { cloudStatus('No se pudo borrar en la nube (' + (e.message || e) + ').'); return false; }
 }
@@ -210,6 +226,7 @@ $('form-add').addEventListener('submit', (e) => {
   $('ai-hint').classList.add('hidden');
   toggleForm(false); render();
   cloudPush(items[0]);
+  cloudTombstone(sku, true);
 });
 
 // Normaliza Valor/Detalle antes de leer/guardar: 100uf 25v -> 100uF 25V
