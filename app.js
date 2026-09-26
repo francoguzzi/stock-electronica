@@ -356,7 +356,7 @@ $('btn-cloud').onclick = () => {
   if ($('f-sb-key') && !(($('f-sb-key').value || '').trim())) $('f-sb-key').value = cfg.key || '';
 };
 $('btn-cloud-on').onclick = async () => {
-  setCfg({ url: ($('f-sb-url').value || '').trim().replace(//$/, ''), key: ($('f-sb-key').value || '').trim(), off: false });
+  setCfg({ url: ($('f-sb-url').value || '').trim().replace(/[/]$/, ''), key: ($('f-sb-key').value || '').trim(), off: false });
   cloudStatus('Conectando…');
   if (await cloudConnect(false)) cloudPull();
 };
