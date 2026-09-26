@@ -171,7 +171,7 @@ const KNOWLEDGE = [
   { keys: ["MB102", "FUENTE PROTOBOARD", "FUENTE MB102"], name: "Fuente MB102", cat: "Módulos / Placas", desc: "Fuente 3.3/5V para protoboard.", pkg: "Módulo", min: 1 },
   { keys: ["TP4056"], name: "TP4056", cat: "Módulos / Placas", desc: "Módulo cargador de baterías Li-ion 1A, con y sin protección.", pkg: "Módulo", min: 2 },
   { keys: ["JOYSTICK", "KY-023"], name: "Joystick KY-023", cat: "Módulos / Placas", desc: "Joystick analógico XY con pulsador.", pkg: "Módulo", min: 1 },
-  { keys: ["ENCODER", "KY-040"], name: "Encoder KY-040", cat: "Módulos / Placas", desc: "Encoder rotativo con pulsador para menús y volumen.", pkg: "Módulo", min: 1 },
+  { keys: ["ENCODER", "KY-040"], name: "Encoder KY-040", cat: "Módulos / Placas", desc: "Encoder rotativo con pulsador para menús y volumen.", pkg: "Módulo", min: 2 },
   { keys: ["TB6600"], name: "TB6600", cat: "Drivers", desc: "Driver paso a paso 4A para motores grandes.", pkg: "Módulo", min: 1 },
   { keys: ["TB6560"], name: "TB6560", cat: "Drivers", desc: "Driver paso a paso 3A para CNC.", pkg: "Módulo", min: 1 },
   { keys: ["L9110S", "L9110", "MX1508"], name: "L9110S", cat: "Drivers", desc: "Driver doble para motores DC chicos.", pkg: "Módulo", min: 2 },
@@ -228,7 +228,7 @@ const KNOWLEDGE = [
   { keys: ["CAPACITOR SMD", "CONDENSADOR SMD"], name: "Capacitor SMD", cat: "Capacitores", desc: "Capacitor chip. Completá capacidad y voltaje.", pkg: "SMD", min: 10 },
   { keys: ["BORNERA", "BORNE", "TERMINAL BLOCK"], name: "Bornera", cat: "Conectores", desc: "Conector a tornillo para cables en PCB.", pkg: "5.08mm", min: 10 },
   { keys: ["JUMPER", "DUPONT"], name: "Jumpers Dupont", cat: "Conectores", desc: "Cables para protoboard y conexiones rápidas.", pkg: "M-H/M-M", min: 1 },
-  { keys: ["HEADER", "PIN HEADER", "PINES"], name: "Tira de pines", cat: "Conectores", desc: "Pines macho/hembra para PCB y módulos.", pkg: "Varios", min: 5 },
+  { keys: ["HEADER", "PIN HEADER", "PINES"], name: "Tira de pines", cat: "Conectores", desc: "Pines macho/hembra para PCB y módulos.", pkg: "2.54mm", min: 5 },
   { keys: ["DC JACK", "JACK DC", "CONECTOR DC"], name: "Jack DC", cat: "Conectores", desc: "Jack de alimentación 5.5x2.1mm para fuentes.", pkg: "Panel/PCB", min: 3 },
   { keys: ["JST"], name: "Conector JST", cat: "Conectores", desc: "Conector chico para baterías y placas (ej: JST-XH).", pkg: "Varios", min: 5 },
   { keys: ["JACK 3.5", "JACK AUDIO", "AUDIO JACK", "PLUG 3.5"], name: "Jack 3.5mm", cat: "Conectores", desc: "Jack estéreo 3.5mm para audio.", pkg: "Panel/PCB", min: 3 },
@@ -273,7 +273,7 @@ const KNOWLEDGE = [
   { keys: ["ADAPTADOR SOIC", "SOIC", "PLACA ADAPTADORA"], name: "Adaptador SOIC", cat: "Insumos", desc: "Placa para pasar SMD a DIP.", pkg: "Varios", min: 2 },
 ];
 
-// Genéricos por fragmento: enganchan escritura parcial ("RESI", "CAPA", "DIOD"...)
+// Genéricos por fragmento: enganchan escritura parcial ("RESI", "CAPA", "DIOD...")
 // Se buscan DESPUÉS de la base exacta, para no tapar códigos específicos.
 const GENERIC = [
   { frag: ["RESIST"], name: "Resistencia", cat: "Resistencias", desc: "Resistencia. Limita la corriente. Completá valor en ohm y potencia.", pkg: "Axial", min: 10 },
@@ -388,6 +388,7 @@ function requiredFor(cat) {
   if (cat === "Capacitores") return [["cap", "capacidad (ej: 100uF)"], ["volt", "voltaje (ej: 25V)"]];
   if (cat === "Resistencias") return [["res", "valor en ohm (ej: 10K, 4K7)"], ["watts", "potencia (ej: 1/4W)"]];
   if (cat === "Tiristores") return [["amps", "corriente (ej: 15A)"], ["volt", "tensión (ej: 600V)"]];
+  if (cat === "Reguladores") return [["volt", "tensión de salida (ej: 5V)"]];
   if (cat === "Diodos / LED") return [];
   return [];
 }
