@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Stock Electrónica</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header>
+    <div class="head">
+      <div>
+        <h1>Stock Electrónica</h1>
+        <p class="sub">Control de componentes · taller / laboratorio</p>
+      </div>
+      <button id="btn-cloud" class="ghost" title="Base compartida">Nube</button>
+      <span id="cloud-dot" class="small"></span>
+      <button id="btn-new" class="primary">+ Nuevo</button>
+    </div>
+    <div class="stats">
+      <div><strong id="st-total">0</strong><span>Total</span></div>
+      <div><strong id="st-low">0</strong><span>Bajo stock</span></div>
+      <div><strong id="st-out">0</strong><span>Sin stock</span></div>
+    </div>
+  </header>
+
+  <main>
+    <section class="card hidden" id="card-cloud">
+      <h2>Base compartida (nube)</h2>
+      <p class="small">Claves pre-cargadas: tocá Conectar. En modo nube los datos viven en Supabase, no en este dispositivo.</p>
+      <label>URL del proyecto <input id="f-sb-url" placeholder="https://xyz.supabase.co" autocomplete="off" /></label>
+      <label>Clave pública (anon) <input id="f-sb-key" placeholder="eyJ…" autocomplete="off" /></label>
+      <div id="cloud-status" class="small"></div>
+      <div class="form-actions">
+        <button type="button" id="btn-cloud-off" class="ghost">Desconectar</button>
+        <button type="button" id="btn-cloud-sync" class="ghost">Sincronizar</button>
+        <button type="button" id="btn-cloud-on" class="primary">Conectar</button>
+      </div>
+    </section>
+    <section class="card hidden" id="card-form">
+      <h2>Nuevo componente</h2>
+      <form id="form-add">
+        <label>Nombre * <input id="f-name" placeholder="Ej: LM324N" required autocomplete="off" /></label>
+        <div id="suggest" class="suggest hidden"></div>
+        <div id="ai-hint" class="ai hidden"></div>
+        <label>Código / SKU *
+          <div class="row2">
+            <input id="f-sku" placeholder="Ej: IC-OPAMP-LM324" required />
+            <button type="button" id="btn-sku" class="ghost" title="Generar desde nombre">Auto</button>
+          </div>
+        </label>
+        <div class="grid2">
+          <label>Categoría
+            <select id="f-cat">
+              <option value="">Sin categoría</option>
+              <option>Resistencias</option><option>Capacitores</option>
+              <option>Diodos / LED</option><option>Transistores</option>
+              <option>Tiristores</option><option>Reguladores</option>
+              <option>ICs</option><option>Drivers</option>
+              <option>Módulos / Placas</option>
+              <option>Conectores</option><option>Sensores</option>
+              <option>Insumos</option><option>Otros</option>
+            </select>
+          </label>
+          <label>Ubicación <input id="f-loc" placeholder="Ej: Caja IC-02" /></label>
+        </div>
+        <div class="grid2">
+          <label>Valor <input id="f-val" placeholder="Ej: 100uF, 10K, 15A 600V" autocomplete="off" /></label>
+          <label>Detalle <input id="f-spec" placeholder="Ej: 25V, 1/4W" autocomplete="off" /></label>
+        </div>
+        <div class="grid2">
+          <label>Cantidad inicial <input id="f-qty" type="number" min="0" value="0" /></label>
+          <label>Avisar si baja de <input id="f-min" type="number" min="0" value="1" /></label>
+        </div>
+        <div class="form-actions">
+          <button type="button" id="btn-cancel" class="ghost">Cancelar</button>
+          <button type="submit" class="primary">Guardar componente</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="card">
+      <h2>Mi inventario</h2>
+      <input id="search" placeholder="Buscar por nombre, SKU, valor…" autocomplete="off" />
+      <div class="filters">
+        <select id="f-filter-cat">
+          <option value="">Todas las categorías</option>
+          <option>Resistencias</option><option>Capacitores</option>
+          <option>Diodos / LED</option><option>Transistores</option>
+          <option>Tiristores</option><option>Reguladores</option>
+          <option>ICs</option><option>Drivers</option>
+          <option>Módulos / Placas</option><option>Conectores</option>
+          <option>Sensores</option><option>Insumos</option>
+          <option>Otros</option>
+        </select>
+        <label class="check"><input type="checkbox" id="f-low" /> Bajo stock</label>
+      </div>
+      <div id="count-line" class="small"></div>
+      <div id="empty" class="empty">
+        <strong>Aún no hay nada cargado.</strong>
+        <p>1. Tocá <b>+ Nuevo</b><br/>2. Cargá nombre y cantidad<br/>3. Usá Entrada / Salida para mover stock</p>
+      </div>
+      <ul id="list"></ul>
+    </section>
+  </main>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+  <script>
+    if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+      navigator.serviceWorker.register('sw.js').catch(() => {});
+    }
+  </script>
+</body>
+</html>
