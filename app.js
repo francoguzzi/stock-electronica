@@ -154,7 +154,7 @@ function render() {
       '<div class="meta"></div>' +
       '<div class="desc"></div>' +
       '<div class="qtybox"><div class="stepper"><button data-a="out">−</button><span class="qty"></span><button data-a="in">+</button></div><span class="min"></span></div>' +
-      '<div class="row-actions"><button data-a="in5">Entrada +5</button><button data-a="out1">Salida −1</button><button data-a="del" class="danger">Eliminar</button></div>';
+      '<div class="row-actions"><button data-a="in5">Entrada +5</button><button data-a="out1">Salida −1</button><button data-a="edit">Editar</button><button data-a="del" class="danger">Eliminar</button></div>';
     li.querySelector('strong').textContent = c.name;
     li.querySelector('.meta').textContent = [c.sku, c.cat || 'Sin categoría', c.val || '', c.spec || '', c.loc || ''].filter(Boolean).join(' · ');
     li.querySelector('.desc').textContent = c.desc || '';
@@ -165,6 +165,7 @@ function render() {
     li.querySelector('[data-a="out"]').onclick = () => move(c.sku, -1);
     li.querySelector('[data-a="in5"]').onclick = () => move(c.sku, 5);
     li.querySelector('[data-a="out1"]').onclick = () => move(c.sku, -1);
+    li.querySelector('[data-a="edit"]').onclick = () => startEdit(c.sku);
     li.querySelector('[data-a="del"]').onclick = () => {
       if (confirm('¿Eliminar ' + c.name + '?')) del(c.sku);
     };
@@ -193,9 +194,48 @@ function toggleForm(show) {
   $('card-form').classList.toggle('hidden', !show);
   if (show) $('f-name').focus();
 }
+function startEdit(sku) {
+  const c = load().find((x) => x.sku === sku);
+  if (!c) return;
+  editingSku = sku;
+  $('form-title').textContent = 'Editar componente';
+  $('btn-save').textContent = 'Guardar cambios';
+  $('lbl-qty').textContent = 'Cantidad actual';
+  $('f-name').value = c.name || '';
+  $('f-sku').value = c.sku || '';
+  $('f-sku').disabled = true;
+  $('f-cat').value = c.cat || '';
+  $('f-loc').value = c.loc || '';
+  $('f-val').value = c.val || '';
+  $('f-spec').value = c.spec || '';
+  $('f-qty').value = c.qty || 0;
+  $('f-min').value = c.min || 0;
+  aiAuto = false; skuAuto = false; pendingDesc = '';
+  $('suggest').classList.add('hidden'); $('suggest').innerHTML = '';
+  $('ai-hint').classList.add('hidden');
+  toggleForm(true);
+  $('card-form').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+function resetEdit() {
+  editingSku = null;
+  $('form-title').textContent = 'Nuevo componente';
+  $('btn-save').textContent = 'Guardar componente';
+  $('lbl-qty').textContent = 'Cantidad inicial';
+  $('f-sku').disabled = false;
+}
+function resetFormFields() {
+  $('form-add').reset(); $('f-qty').value = 0; $('f-min').value = 1;
+  aiAuto = false; skuAuto = false; pendingDesc = '';
+  $('suggest').classList.add('hidden'); $('suggest').innerHTML = '';
+  $('ai-hint').classList.add('hidden');
+}
 
-$('btn-new').onclick = () => toggleForm($('card-form').classList.contains('hidden'));
-$('btn-cancel').onclick = () => toggleForm(false);
+$('btn-new').onclick = () => {
+  const opening = $('card-form').classList.contains('hidden');
+  resetEdit(); resetFormFields();
+  toggleForm(opening);
+};
+$('btn-cancel').onclick = () => { resetEdit(); toggleForm(false); };
 const SKU_PREFIX = { "Resistencias": "RES", "Capacitores": "CAP", "Diodos / LED": "DIO", "Transistores": "TRA", "Tiristores": "TRI", "Reguladores": "REG", "ICs": "IC", "Drivers": "DRV", "Módulos / Placas": "MOD", "Conectores": "CON", "Sensores": "SEN", "Insumos": "INS" };
 function genSKU() {
   const n = $('f-name').value.trim().toUpperCase().replace(/[^A-Z0-9]+/g, '-').replace(/^-|-$/g, '');
@@ -210,6 +250,16 @@ $('form-add').addEventListener('submit', (e) => {
   const sku = $('f-sku').value.trim();
   if (!name || !sku) return;
   const items = load();
+  if (editingSku) {
+    const i = items.findIndex((x) => x.sku === editingSku);
+    if (i < 0) { resetEdit(); return; }
+    items[i] = { sku: editingSku, name, cat: $('f-cat').value, loc: $('f-loc').value.trim(), val: normVal(), spec: normSpec(), desc: buildDesc(name, editingSku), qty: Math.max(0, parseInt($('f-qty').value || '0', 10)), min: Math.max(0, parseInt($('f-min').value || '0', 10)) };
+    save(items); resetFormFields(); toggleForm(false); render();
+    cloudPush(items[i]);
+    cloudTombstone(items[i].sku, true);
+    resetEdit();
+    return;
+  }
   if (items.some((x) => x.sku.toLowerCase() === sku.toLowerCase())) { alert('Ese código SKU ya existe.'); return; }
   items.unshift({
     sku, name,
@@ -220,11 +270,7 @@ $('form-add').addEventListener('submit', (e) => {
     qty: Math.max(0, parseInt($('f-qty').value || '0', 10)),
     min: Math.max(0, parseInt($('f-min').value || '0', 10)),
   });
-  save(items); e.target.reset(); $('f-qty').value = 0; $('f-min').value = 1;
-  aiAuto = false; skuAuto = false; pendingDesc = '';
-  $('suggest').classList.add('hidden'); $('suggest').innerHTML = '';
-  $('ai-hint').classList.add('hidden');
-  toggleForm(false); render();
+  save(items); resetFormFields(); toggleForm(false); render();
   cloudPush(items[0]);
   cloudTombstone(sku, true);
 });
@@ -263,6 +309,7 @@ function buildDesc(name, sku) {
 let aiAuto = false; // true si Valor/Detalle fueron puestos por Autocompletar
 let skuAuto = false; // true si el SKU fue generado con Auto
 let pendingDesc = ''; // descripción traída de Wikipedia, se guarda con el componente
+let editingSku = null; // SKU en edición (null = alta nueva)
 function refreshAI(src) {
   // Si cambia el Nombre y lo anterior era auto, se descarta (evita el dato viejo)
   if (src === 'f-name') {
