@@ -8,6 +8,7 @@
   <title>Stock Electrónica</title>
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" href="icon.svg" type="image/svg+xml" />
+  <script>try{var t=localStorage.getItem('stock_theme');if(t)document.documentElement.dataset.theme=t;}catch(e){}</script>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -21,6 +22,7 @@
       <div class="head-actions">
         <button id="btn-cloud" class="ghost" title="Base compartida">Nube</button>
         <button id="btn-buy" class="ghost" title="Lista de compras">Compras <span id="buy-count"></span></button>
+        <button id="btn-theme" class="ghost" title="Tema claro/oscuro">Oscuro</button>
         <span id="cloud-dot" class="small"></span>
       </div>
     </div>
@@ -90,7 +92,7 @@
       <h2>Mi inventario</h2>
       <input id="search" placeholder="Buscar por nombre, SKU, valor…" autocomplete="off" />
       <div class="filters">
-        <select id="f-filter-cat">
+        <div class="chips" id="chips-cat"></div><select id="f-filter-cat" class="hidden">
           <option value="">Todas las categorías</option>
           <option>Resistencias</option><option>Capacitores</option>
           <option>Diodos / LED</option><option>Transistores</option>

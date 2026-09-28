@@ -168,6 +168,7 @@ function render() {
   });
   $('count-line').textContent = (q || fc || lowOnly) ? ('Mostrando ' + items.length + ' de ' + all.length) : '';
   renderBuy(all);
+  renderChips();
   const empty = $('empty');
   if (!all.length) { empty.style.display = 'block'; empty.innerHTML = '<strong>Aún no hay nada cargado.</strong><p>1. Tocá <b>+ Nuevo</b><br/>2. Cargá nombre y cantidad<br/>3. Usá Entrada / Salida para mover stock</p>'; }
   else if (!items.length) { empty.style.display = 'block'; empty.innerHTML = '<strong>Sin resultados.</strong><p>Probá otra palabra o limpiá los filtros.</p>'; }
@@ -659,6 +660,32 @@ function renderSuggest() {
   });
 }
 
+// Tema claro/oscuro (el <script> del head lo pre-aplica para evitar flash)
+function applyThemeLabel() { const b = $('btn-theme'); if (b) b.textContent = document.documentElement.dataset.theme === 'dark' ? 'Claro' : 'Oscuro'; }
+if ($('btn-theme')) $('btn-theme').onclick = () => {
+  const next = document.documentElement.dataset.theme === 'dark' ? '' : 'dark';
+  if (next) document.documentElement.dataset.theme = next; else document.documentElement.removeAttribute('data-theme');
+  try { localStorage.setItem('stock_theme', next); } catch {}
+  applyThemeLabel();
+};
+applyThemeLabel();
+
+// Chips de categoría (escriben en el select oculto, que sigue mandando)
+const CATS = ['', 'Resistencias', 'Capacitores', 'Diodos / LED', 'Transistores', 'Tiristores', 'Reguladores', 'ICs', 'Drivers', 'Módulos / Placas', 'Conectores', 'Sensores', 'Insumos', 'Otros'];
+function renderChips() {
+  const box = $('chips-cat');
+  if (!box) return;
+  const cur = $('f-filter-cat') ? $('f-filter-cat').value : '';
+  box.innerHTML = '';
+  CATS.forEach((c) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'chip' + (cur === c ? ' on' : '');
+    b.textContent = c || 'Todas';
+    b.onclick = () => { if ($('f-filter-cat')) $('f-filter-cat').value = c; render(); };
+    box.appendChild(b);
+  });
+}
 render();
 applyDeepLink();
 
