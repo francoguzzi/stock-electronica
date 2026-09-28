@@ -386,6 +386,14 @@ function move(sku, d) {
   c.qty = Math.max(0, c.qty + d);
   save(items); render();
   cloudPush(c);
+  try {
+    const el = Array.from(document.querySelectorAll('#list li.item')).find((li) => {
+      const m = li.querySelector('.meta');
+      return m && m.textContent.indexOf(sku) !== -1;
+    });
+    const q = el && el.querySelector('.qty');
+    if (q) { q.classList.remove('pop'); void q.offsetWidth; q.classList.add('pop'); }
+  } catch {}
 }
 function del(sku) {
   const items = load();
