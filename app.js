@@ -199,7 +199,7 @@ function renderBuy(all) {
 $('btn-buy').onclick = () => $('card-buy').classList.toggle('hidden');
 $('btn-buy-copy').onclick = () => {
   const needy = load().filter((c) => c.qty <= c.min);
-  const txt = needy.map((c) => '- ' + c.name + ' (' + c.sku + ') x' + (buyNeed(c) || 1)).join(\n);
+  const txt = needy.map((c) => '- ' + c.name + ' (' + c.sku + ') x' + (buyNeed(c) || 1)).join('\n');
   const done = () => { $('btn-buy-copy').textContent = 'Copiado'; };
   if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(done).catch(() => fallbackCopy(txt, done));
   else fallbackCopy(txt, done);
