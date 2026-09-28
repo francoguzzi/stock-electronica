@@ -168,7 +168,6 @@ function render() {
   });
   $('count-line').textContent = (q || fc || lowOnly) ? ('Mostrando ' + items.length + ' de ' + all.length) : '';
   renderBuy(all);
-  renderChips();
   const empty = $('empty');
   if (!all.length) { empty.style.display = 'block'; empty.innerHTML = '<strong>Aún no hay nada cargado.</strong><p>1. Tocá <b>+ Nuevo</b><br/>2. Cargá nombre y cantidad<br/>3. Usá Entrada / Salida para mover stock</p>'; }
   else if (!items.length) { empty.style.display = 'block'; empty.innerHTML = '<strong>Sin resultados.</strong><p>Probá otra palabra o limpiá los filtros.</p>'; }
@@ -199,8 +198,7 @@ function render() {
     li.querySelector('[data-a="out1"]').onclick = () => move(c.sku, -1);
     li.querySelector('[data-a="out1"]').disabled = c.qty <= 0;
     li.querySelector('[data-a="edit"]').onclick = () => startEdit(c.sku);
-    li.querySelector('[data-a="qr"]').onclick = (e) => { e.stopPropagation(); toggleQR(li, c.sku); };
-    li.querySelector('.top').onclick = () => li.classList.toggle('open');
+    li.querySelector('[data-a="qr"]').onclick = () => toggleQR(li, c.sku);
     li.querySelector('[data-a="del"]').onclick = () => {
       if (confirm('¿Eliminar ' + c.name + '?')) del(c.sku);
     };
@@ -388,14 +386,6 @@ function move(sku, d) {
   c.qty = Math.max(0, c.qty + d);
   save(items); render();
   cloudPush(c);
-  try {
-    const el = Array.from(document.querySelectorAll('#list li.item')).find((li) => {
-      const m = li.querySelector('.meta');
-      return m && m.textContent.indexOf(sku) !== -1;
-    });
-    const q = el && el.querySelector('.qty');
-    if (q) { q.classList.remove('pop'); void q.offsetWidth; q.classList.add('pop'); }
-  } catch {}
 }
 function del(sku) {
   const items = load();
@@ -661,32 +651,6 @@ function renderSuggest() {
   });
 }
 
-// Tema claro/oscuro (el <script> del head lo pre-aplica para evitar flash)
-function applyThemeLabel() { const b = $('btn-theme'); if (b) b.textContent = document.documentElement.dataset.theme === 'dark' ? 'Claro' : 'Oscuro'; }
-if ($('btn-theme')) $('btn-theme').onclick = () => {
-  const next = document.documentElement.dataset.theme === 'dark' ? '' : 'dark';
-  if (next) document.documentElement.dataset.theme = next; else document.documentElement.removeAttribute('data-theme');
-  try { localStorage.setItem('stock_theme', next); } catch {}
-  applyThemeLabel();
-};
-applyThemeLabel();
-
-// Chips de categoría (escriben en el select oculto, que sigue mandando)
-const CATS = ['', 'Resistencias', 'Capacitores', 'Diodos / LED', 'Transistores', 'Tiristores', 'Reguladores', 'ICs', 'Drivers', 'Módulos / Placas', 'Conectores', 'Sensores', 'Insumos', 'Otros'];
-function renderChips() {
-  const box = $('chips-cat');
-  if (!box) return;
-  const cur = $('f-filter-cat') ? $('f-filter-cat').value : '';
-  box.innerHTML = '';
-  CATS.forEach((c) => {
-    const b = document.createElement('button');
-    b.type = 'button';
-    b.className = 'chip' + (cur === c ? ' on' : '');
-    b.textContent = c || 'Todas';
-    b.onclick = () => { if ($('f-filter-cat')) $('f-filter-cat').value = c; render(); };
-    box.appendChild(b);
-  });
-}
 render();
 applyDeepLink();
 
