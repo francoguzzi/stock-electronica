@@ -199,7 +199,8 @@ function render() {
     li.querySelector('[data-a="out1"]').onclick = () => move(c.sku, -1);
     li.querySelector('[data-a="out1"]').disabled = c.qty <= 0;
     li.querySelector('[data-a="edit"]').onclick = () => startEdit(c.sku);
-    li.querySelector('[data-a="qr"]').onclick = () => toggleQR(li, c.sku);
+    li.querySelector('[data-a="qr"]').onclick = (e) => { e.stopPropagation(); toggleQR(li, c.sku); };
+    li.querySelector('.top').onclick = () => li.classList.toggle('open');
     li.querySelector('[data-a="del"]').onclick = () => {
       if (confirm('¿Eliminar ' + c.name + '?')) del(c.sku);
     };
