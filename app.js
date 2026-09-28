@@ -304,7 +304,7 @@ function importCSV(file) {
       if (!rows.length) { alert('CSV vacío.'); return; }
       var head = rows[0].map(function (h) { return (h || '').trim().toLowerCase(); });
       function idx(names) { return head.findIndex(function (h) { return names.indexOf(h) !== -1; }); }
-      var ci = { sku: idx(['sku', 'codigo']), name: idx(['name', 'nombre']), cat: idx(['cat', 'categoria']), loc: idx(['loc', 'ubicacion']), val: idx(['val', 'valor']), spec: idx(['spec', 'detalle']), desc: idx(['desc', 'descripcion']), qty: idx(['qty', 'cantidad', 'stock']), min: idx(['min', 'minimo']) };
+      var ci = { sku: idx(['sku', 'codigo', 'código']), name: idx(['name', 'nombre']), cat: idx(['cat', 'categoria', 'categoría']), loc: idx(['loc', 'ubicacion', 'ubicación']), val: idx(['val', 'valor']), spec: idx(['spec', 'detalle']), desc: idx(['desc', 'descripcion', 'descripción']), qty: idx(['qty', 'cantidad', 'stock']), min: idx(['min', 'minimo', 'mínimo']) };
       if (ci.sku < 0 || ci.name < 0) { alert('El CSV necesita columnas sku y name (o nombre).'); return; }
       var items = load(), nNew = 0, nUpd = 0, k;
       function get(x, key, dflt) { return (ci[key] >= 0 && x[ci[key]] != null) ? String(x[ci[key]]).trim() : dflt; }
