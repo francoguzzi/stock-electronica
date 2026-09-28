@@ -154,6 +154,7 @@ function render() {
       '<div class="top"><strong></strong><span class="badge ' + s.cls + '">' + s.t + '</span></div>' +
       '<div class="meta"></div>' +
       '<div class="desc"></div>' +
+      '<div class="qr hidden"></div>' +
       '<div class="qtybox"><div class="stepper"><button data-a="out">−</button><span class="qty"></span><button data-a="in">+</button></div><span class="min"></span></div>' +
       '<div class="row-actions"><button data-a="in5">Entrada +5</button><button data-a="out1">Salida −1</button><button data-a="edit">Editar</button><button data-a="qr">QR</button><button data-a="del" class="danger">Eliminar</button></div>';
     li.querySelector('strong').textContent = c.name;
