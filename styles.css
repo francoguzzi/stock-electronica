@@ -172,3 +172,13 @@ header h1 { font-size: 1.25rem; font-weight: 700; }
 .row-actions button { font-size: .88rem; }
 .meta { font-size: .85rem; }
 button.primary { font-size: 1rem; }
+
+/* === Apple v4: hidden blindado, azules dark reales, acciones texto === */
+.hidden { display: none !important; }
+html[data-theme="dark"] { --blue: #0a84ff; --red: #ff453a; --orange: #ff9f0a; --green: #30d158; }
+.row-actions { display: flex; flex-wrap: wrap; gap: 4px 16px; }
+.row-actions button { background: transparent; border: none; box-shadow: none; min-height: 36px; min-width: 0; margin: 0; padding: 6px 4px; font-size: .92rem; }
+.row-actions button:active { transform: scale(.95); background: transparent; }
+.row-actions button.danger { background: transparent; }
+#buy-list .row-actions button[data-a="bought"] { background: var(--blue); color: #fff; border-radius: 10px; padding: 8px 14px; font-weight: 700; }
+#buy-list .row-actions { gap: 8px; }
