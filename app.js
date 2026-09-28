@@ -63,8 +63,34 @@ function rtStart() {
   } catch {}
 }
 function rtStop() { try { if (RT && SB) SB.removeChannel(RT); } catch {} RT = null; }
+// Cola de pendientes: sobrevive offline y se vacía sola al reconectar
+const PEND_KEY = 'stock_pending_v1';
+const loadPend = () => { try { return JSON.parse(localStorage.getItem(PEND_KEY)) || { up: {}, del: {} }; } catch { return { up: {}, del: {} }; } };
+const savePend = (p) => { try { localStorage.setItem(PEND_KEY, JSON.stringify(p)); } catch {} };
+async function flushPending() {
+  if (!cloudOk) return false;
+  const p = loadPend();
+  const sus = Object.keys(p.up), sds = Object.keys(p.del);
+  if (!sus.length && !sds.length) return true;
+  try {
+    for (const sku of sus) {
+      const { error } = await SB.from('components').upsert(toRow(p.up[sku]), { onConflict: 'sku' });
+      if (error) throw error;
+      delete p.up[sku]; savePend(p);
+    }
+    for (const sku of sds) {
+      const { error: e1 } = await SB.from('deleted_skus').upsert({ sku }, { onConflict: 'sku' });
+      if (e1) throw e1;
+      const { error: e2 } = await SB.from('components').delete().eq('sku', sku);
+      if (e2) throw e2;
+      delete p.del[sku]; savePend(p);
+    }
+    return true;
+  } catch (e) { cloudStatus('Pendientes sin subir (' + (e.message || e) + '). Se reintentan solos.'); return false; }
+}
 async function cloudPull() {
   if (!cloudOk && !(await cloudConnect(true))) { cloudStatus('Sin nube: trabajo local.'); return; }
+  await flushPending();
   try {
     const got = await SB.from('components').select('*');
     const tbs = await SB.from('deleted_skus').select('sku');
@@ -101,11 +127,13 @@ async function cloudTombstone(sku, remove) {
   } catch (e) { cloudStatus('Fallo lápida (' + (e.message || e) + ').'); return false; }
 }
 async function cloudPush(item) {
+  const p = loadPend(); p.up[item.sku] = item; delete p.del[item.sku]; savePend(p);
   if (!cloudOk) return;
   try {
     const { error } = await SB.from('components').upsert(toRow(item), { onConflict: 'sku' });
     if (error) throw error;
-  } catch (e) { cloudStatus('No se pudo subir (' + (e.message || e) + '). Revisá tabla y RLS.'); }
+    const q = loadPend(); delete q.up[item.sku]; savePend(q);
+  } catch (e) { cloudStatus('No se pudo subir (' + (e.message || e) + '). Queda en cola.'); }
 }
 async function cloudDel(sku) {
   if (!cloudOk) return true;
@@ -165,8 +193,10 @@ function render() {
     li.querySelector('.min').textContent = 'Mín: ' + c.min;
     li.querySelector('[data-a="in"]').onclick = () => move(c.sku, 1);
     li.querySelector('[data-a="out"]').onclick = () => move(c.sku, -1);
+    li.querySelector('[data-a="out"]').disabled = c.qty <= 0;
     li.querySelector('[data-a="in5"]').onclick = () => move(c.sku, 5);
     li.querySelector('[data-a="out1"]').onclick = () => move(c.sku, -1);
+    li.querySelector('[data-a="out1"]').disabled = c.qty <= 0;
     li.querySelector('[data-a="edit"]').onclick = () => startEdit(c.sku);
     li.querySelector('[data-a="qr"]').onclick = () => toggleQR(li, c.sku);
     li.querySelector('[data-a="del"]').onclick = () => {
@@ -189,7 +219,7 @@ function renderBuy(all) {
     const need = buyNeed(c);
     const li = document.createElement('li');
     li.className = 'item low';
-    li.innerHTML = '<div class="top"><strong></strong><span class="badge warn">Faltan: ' + need + '</span></div>' +
+    li.innerHTML = '<div class="top"><strong></strong><span class="badge warn">' + (need > 0 ? 'Faltan: ' + need : 'En mínimo') + '</span></div>' +
       '<div class="meta"></div>' +
       '<div class="row-actions"><button data-a="bought">Comprado (+' + (need || 1) + ')</button><button data-a="deld" class="danger">Eliminar</button></div>';
     li.querySelector('strong').textContent = c.name;
@@ -205,7 +235,7 @@ $('btn-buy').onclick = () => $('card-buy').classList.toggle('hidden');
 $('btn-buy-copy').onclick = () => {
   const needy = load().filter((c) => c.qty <= c.min);
   const txt = needy.map((c) => '- ' + c.name + ' (' + c.sku + ') x' + (buyNeed(c) || 1)).join('\n');
-  const done = () => { $('btn-buy-copy').textContent = 'Copiado'; };
+  const done = () => { $('btn-buy-copy').textContent = 'Copiado'; setTimeout(() => { $('btn-buy-copy').textContent = 'Copiar lista'; }, 1500); };
   if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(done).catch(() => fallbackCopy(txt, done));
   else fallbackCopy(txt, done);
 };
@@ -230,7 +260,6 @@ function toggleQR(li, sku) {
   const box = li.querySelector('.qr');
   box.classList.toggle('hidden');
   if (!box.classList.contains('hidden') && !box.dataset.done) {
-    box.dataset.done = '1';
     const url = qrPayload(sku);
     if (typeof qrcode === 'function') {
       try {
@@ -239,6 +268,7 @@ function toggleQR(li, sku) {
         qr.make();
         box.innerHTML = qr.createSvgTag({ cellSize: 6, margin: 0, scalable: true }) + '<small></small>';
         box.querySelector('small').textContent = url;
+        box.dataset.done = '1';
       } catch { box.textContent = url; }
     } else box.textContent = url + ' (QR offline no disponible: abri una vez con internet)';
   }
@@ -279,7 +309,7 @@ function parseCSV(text) {
   if (text.charCodeAt(0) === 65279) text = text.slice(1);
   text = text.split(CR + LF).join(LF).split(CR).join(LF);
   var head = (text.split(LF)[0] || '').toLowerCase();
-  var delim = (head.indexOf(';') !== -1 && head.indexOf(',') === -1) ? ';' : ',';
+  var delim = detectDelim(head);
   var rows = [], row = [], field = '', inQ = false;
   for (var i = 0; i < text.length; i++) {
     var ch = text[i];
@@ -294,7 +324,20 @@ function parseCSV(text) {
     else field += ch;
   }
   row.push(field); rows.push(row);
-  return rows.filter(function (x) { return x.length > 1 || (x[0] || '').trim() !== ''; });
+  var out = rows.filter(function (x) { return x.length > 1 || (x[0] || '').trim() !== ''; });
+  out.warned = inQ;
+  return out;
+}
+function detectDelim(head) {
+  var c1 = 0, c2 = 0, inQ = false, QU = String.fromCharCode(34);
+  for (var i = 0; i < head.length; i++) {
+    var ch = head[i];
+    if (ch === QU) inQ = !inQ;
+    else if (!inQ && ch === ',') c1++;
+    else if (!inQ && ch === ';') c2++;
+  }
+  if (c2 > 0 && c2 >= c1) return ';';
+  return ',';
 }
 function importCSV(file) {
   var rd = new FileReader();
@@ -322,7 +365,9 @@ function importCSV(file) {
         cloudTombstone(sku, true);
       }
       save(items); render();
-      cloudStatus('CSV: ' + nNew + ' nuevos, ' + nUpd + ' actualizados.');
+      var msg = 'CSV: ' + nNew + ' nuevos, ' + nUpd + ' actualizados.' + (rows.warned ? ' Ojo: una comilla quedó abierta, revisá los datos.' : '');
+      cloudStatus(msg);
+      if (rows.warned) alert(msg);
     } catch (e) { alert('No se pudo importar: ' + (e.message || e)); }
   };
   rd.readAsText(file);
@@ -345,9 +390,11 @@ function move(sku, d) {
 function del(sku) {
   const items = load();
   const gone = items.find((x) => x.sku === sku);
+  if (!gone) return;
   save(items.filter((x) => x.sku !== sku)); render();
-  if (cloudOk && gone) cloudDel(sku).then((ok) => {
-    if (!ok) { save([...load(), gone]); render(); alert('No se pudo borrar en la nube. Revisá tabla y RLS.'); }
+  const p = loadPend(); p.del[sku] = Date.now(); delete p.up[sku]; savePend(p);
+  if (cloudOk) cloudDel(sku).then((ok) => {
+    if (ok) { const q = loadPend(); delete q.del[sku]; savePend(q); }
   });
 }
 
@@ -399,7 +446,7 @@ $('btn-new').onclick = () => {
 $('btn-cancel').onclick = () => { resetEdit(); toggleForm(false); };
 const SKU_PREFIX = { "Resistencias": "RES", "Capacitores": "CAP", "Diodos / LED": "DIO", "Transistores": "TRA", "Tiristores": "TRI", "Reguladores": "REG", "ICs": "IC", "Drivers": "DRV", "Módulos / Placas": "MOD", "Conectores": "CON", "Sensores": "SEN", "Insumos": "INS" };
 function genSKU() {
-  const n = $('f-name').value.trim().toUpperCase().replace(/[^A-Z0-9]+/g, '-').replace(/^-|-$/g, '');
+  const n = $('f-name').value.trim().normalize('NFD').replace(/\p{Diacritic}/gu, '').replace(/Ω/g, 'OHM').replace(/[µμΜ]/g, 'U').toUpperCase().replace(/[^A-Z0-9]+/g, '-').replace(/^-|-$/g, '');
   const cat = SKU_PREFIX[$('f-cat').value] || 'GEN';
   if (n) { $('f-sku').value = cat + '-' + n; skuAuto = true; }
 }
@@ -409,12 +456,12 @@ $('form-add').addEventListener('submit', (e) => {
   e.preventDefault();
   const name = $('f-name').value.trim();
   const sku = $('f-sku').value.trim();
-  if (!name || !sku) return;
+  if (!name || !sku) { alert('Completá nombre y SKU.'); return; }
   const items = load();
   if (editingSku) {
     const i = items.findIndex((x) => x.sku === editingSku);
     if (i < 0) { resetEdit(); return; }
-    items[i] = { sku: editingSku, name, cat: $('f-cat').value, loc: $('f-loc').value.trim(), val: normVal(), spec: normSpec(), desc: buildDesc(name, editingSku), qty: Math.max(0, parseInt($('f-qty').value || '0', 10)), min: Math.max(0, parseInt($('f-min').value || '0', 10)) };
+    items[i] = { sku: editingSku, name, cat: $('f-cat').value, loc: $('f-loc').value.trim(), val: normVal(), spec: normSpec(), desc: buildDesc(name, editingSku), qty: numVal($('f-qty').value, 0), min: numVal($('f-min').value, 0) };
     save(items); resetFormFields(); toggleForm(false); render();
     cloudPush(items[i]);
     cloudTombstone(items[i].sku, true);
@@ -428,8 +475,8 @@ $('form-add').addEventListener('submit', (e) => {
     loc: $('f-loc').value.trim(),
     val: normVal(), spec: normSpec(),
     desc: buildDesc(name, sku),
-    qty: Math.max(0, parseInt($('f-qty').value || '0', 10)),
-    min: Math.max(0, parseInt($('f-min').value || '0', 10)),
+    qty: numVal($('f-qty').value, 0),
+    min: numVal($('f-min').value, 0),
   });
   save(items); resetFormFields(); toggleForm(false); render();
   cloudPush(items[0]);
@@ -447,6 +494,7 @@ function normValSpec() {
   } catch {}
   return { val: $('f-val').value.trim(), spec: $('f-spec').value.trim() };
 }
+function numVal(v, dflt) { var n = parseInt(v, 10); return isNaN(n) ? dflt : Math.max(0, n); }
 function normVal() { return normValSpec().val || $('f-val').value.trim(); }
 function normSpec() { return normValSpec().spec || $('f-spec').value.trim(); }
 
