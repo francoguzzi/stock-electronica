@@ -16,6 +16,7 @@
         <p class="sub">Control de componentes · taller / laboratorio</p>
       </div>
       <button id="btn-cloud" class="ghost" title="Base compartida">Nube</button>
+      <button id="btn-buy" class="ghost" title="Lista de compras">Compras <span id="buy-count"></span></button>
       <span id="cloud-dot" class="small"></span>
       <button id="btn-new" class="primary">+ Nuevo</button>
     </div>
@@ -103,6 +104,15 @@
         <p>1. Tocá <b>+ Nuevo</b><br/>2. Cargá nombre y cantidad<br/>3. Usá Entrada / Salida para mover stock</p>
       </div>
       <ul id="list"></ul>
+    </section>
+
+    <section class="card hidden" id="card-buy">
+      <h2>Lista de compras</h2>
+      <div id="buy-empty" class="empty"><strong>Todo en niveles OK.</strong><p>Nada por reponer.</p></div>
+      <ul id="buy-list"></ul>
+      <div class="form-actions">
+        <button type="button" id="btn-buy-copy" class="ghost">Copiar lista</button>
+      </div>
     </section>
   </main>
 
