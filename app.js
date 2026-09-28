@@ -139,6 +139,7 @@ function render() {
     return true;
   });
   $('count-line').textContent = (q || fc || lowOnly) ? ('Mostrando ' + items.length + ' de ' + all.length) : '';
+  renderBuy(all);
   const empty = $('empty');
   if (!all.length) { empty.style.display = 'block'; empty.innerHTML = '<strong>Aún no hay nada cargado.</strong><p>1. Tocá <b>+ Nuevo</b><br/>2. Cargá nombre y cantidad<br/>3. Usá Entrada / Salida para mover stock</p>'; }
   else if (!items.length) { empty.style.display = 'block'; empty.innerHTML = '<strong>Sin resultados.</strong><p>Probá otra palabra o limpiá los filtros.</p>'; }
@@ -173,6 +174,43 @@ function render() {
   });
 }
 
+// Lista de compras: lo que está en o bajo el mínimo, con faltante y botón Comprado
+function buyNeed(c) { return Math.max((c.min || 0) - (c.qty || 0), 0); }
+function renderBuy(all) {
+  const needy = (all || []).filter((c) => c.qty <= c.min);
+  $('buy-count').textContent = needy.length ? '(' + needy.length + ')' : '';
+  $('buy-empty').style.display = needy.length ? 'none' : 'block';
+  $('btn-buy-copy').style.display = needy.length ? '' : 'none';
+  const ul = $('buy-list');
+  ul.innerHTML = '';
+  needy.forEach((c) => {
+    const need = buyNeed(c);
+    const li = document.createElement('li');
+    li.className = 'item low';
+    li.innerHTML = '<div class="top"><strong></strong><span class="badge warn">Faltan: ' + need + '</span></div>' +
+      '<div class="meta"></div>' +
+      '<div class="row-actions"><button data-a="bought">Comprado (+' + (need || 1) + ')</button></div>';
+    li.querySelector('strong').textContent = c.name;
+    li.querySelector('.meta').textContent = [c.sku, c.cat || '', 'quedan ' + c.qty + ' / mín ' + c.min, c.loc || ''].filter(Boolean).join(' · ');
+    li.querySelector('[data-a="bought"]').onclick = () => move(c.sku, need || 1);
+    ul.appendChild(li);
+  });
+}
+$('btn-buy').onclick = () => $('card-buy').classList.toggle('hidden');
+$('btn-buy-copy').onclick = () => {
+  const needy = load().filter((c) => c.qty <= c.min);
+  const txt = needy.map((c) => '- ' + c.name + ' (' + c.sku + ') x' + (buyNeed(c) || 1)).join(\n);
+  const done = () => { $('btn-buy-copy').textContent = 'Copiado'; };
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(done).catch(() => fallbackCopy(txt, done));
+  else fallbackCopy(txt, done);
+};
+function fallbackCopy(txt, done) {
+  try {
+    const ta = document.createElement('textarea');
+    ta.value = txt; document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); document.body.removeChild(ta); done();
+  } catch {}
+}
 function move(sku, d) {
   const items = load();
   const c = items.find((x) => x.sku === sku);
