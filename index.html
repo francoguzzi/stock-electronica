@@ -99,6 +99,11 @@
         <label class="check"><input type="checkbox" id="f-low" /> Bajo stock</label>
       </div>
       <div id="count-line" class="small"></div>
+      <div class="filters">
+        <button type="button" id="btn-csv-exp" class="ghost">Exportar CSV</button>
+        <button type="button" id="btn-csv-imp" class="ghost">Importar CSV</button>
+        <input type="file" id="f-csv" accept=".csv,text/csv" class="hidden" />
+      </div>
       <div id="empty" class="empty">
         <strong>Aún no hay nada cargado.</strong>
         <p>1. Tocá <b>+ Nuevo</b><br/>2. Cargá nombre y cantidad<br/>3. Usá Entrada / Salida para mover stock</p>
@@ -120,9 +125,21 @@
   <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
   <script src="app.js"></script>
   <script>
-    if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
-      navigator.serviceWorker.register('sw.js').catch(() => {});
-    }
+    (function () {
+      if (!('serviceWorker' in navigator) || !location.protocol.startsWith('http')) return;
+      var pendingReload = false;
+      function safeUpdate() { try { var p = window.__swReg.update(); if (p && p.catch) p.catch(function () {}); } catch (e) {} }
+      function maybeReload() { try { if (pendingReload && document.getElementById('card-form').classList.contains('hidden')) location.reload(); } catch (e) {} }
+      setInterval(maybeReload, 5000);
+      document.addEventListener('visibilitychange', function () { if (!document.hidden && window.__swReg) safeUpdate(); });
+      navigator.serviceWorker.register('sw.js').then(function (reg) {
+        window.__swReg = reg;
+        function watch(w) { if (!w) return; w.addEventListener('statechange', function () { if (w.state === 'installed' && navigator.serviceWorker.controller) { pendingReload = true; maybeReload(); } }); }
+        if (reg.waiting) { pendingReload = true; maybeReload(); }
+        reg.addEventListener('updatefound', function () { watch(reg.installing); });
+      }).catch(function () {});
+      setInterval(function () { if (window.__swReg) safeUpdate(); }, 30 * 60 * 1000);
+    })();
   </script>
 </body>
 </html>

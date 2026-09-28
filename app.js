@@ -251,6 +251,89 @@ function applyDeepLink() {
   } catch {}
 }
 
+// CSV: exportar todo / importar masivo (upsert por SKU)
+function csvEsc(v) {
+  v = String(v == null ? '' : v);
+  var QU = String.fromCharCode(34), LF = String.fromCharCode(10);
+  var needs = v.indexOf(',') !== -1 || v.indexOf(';') !== -1 || v.indexOf(QU) !== -1 || v.indexOf(LF) !== -1;
+  return needs ? QU + v.split(QU).join(QU + QU) + QU : v;
+}
+function exportCSV() {
+  var LF = String.fromCharCode(10);
+  var rows = [['sku', 'name', 'cat', 'loc', 'val', 'spec', 'desc', 'qty', 'min'].join(',')];
+  load().forEach(function (c) {
+    rows.push([c.sku, c.name, c.cat, c.loc, c.val, c.spec, c.desc, c.qty, c.min].map(csvEsc).join(','));
+  });
+  var blob = new Blob([String.fromCharCode(65279) + rows.join(LF)], { type: 'text/csv;charset=utf-8' });
+  var a = document.createElement('a');
+  var d = new Date();
+  function p2(n) { return String(n).padStart(2, '0'); }
+  a.href = URL.createObjectURL(blob);
+  a.download = 'stock-' + d.getFullYear() + p2(d.getMonth() + 1) + p2(d.getDate()) + '.csv';
+  document.body.appendChild(a); a.click();
+  setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+}
+function parseCSV(text) {
+  text = String(text || '');
+  var LF = String.fromCharCode(10), CR = String.fromCharCode(13), QU = String.fromCharCode(34);
+  if (text.charCodeAt(0) === 65279) text = text.slice(1);
+  text = text.split(CR + LF).join(LF).split(CR).join(LF);
+  var head = (text.split(LF)[0] || '').toLowerCase();
+  var delim = (head.indexOf(';') !== -1 && head.indexOf(',') === -1) ? ';' : ',';
+  var rows = [], row = [], field = '', inQ = false;
+  for (var i = 0; i < text.length; i++) {
+    var ch = text[i];
+    if (inQ) {
+      if (ch === QU) {
+        if (text[i + 1] === QU) { field += QU; i++; }
+        else inQ = false;
+      } else field += ch;
+    } else if (ch === QU) inQ = true;
+    else if (ch === delim) { row.push(field); field = ''; }
+    else if (ch === LF) { row.push(field); rows.push(row); row = []; field = ''; }
+    else field += ch;
+  }
+  row.push(field); rows.push(row);
+  return rows.filter(function (x) { return x.length > 1 || (x[0] || '').trim() !== ''; });
+}
+function importCSV(file) {
+  var rd = new FileReader();
+  rd.onload = function () {
+    try {
+      var rows = parseCSV(rd.result);
+      if (!rows.length) { alert('CSV vacío.'); return; }
+      var head = rows[0].map(function (h) { return (h || '').trim().toLowerCase(); });
+      function idx(names) { return head.findIndex(function (h) { return names.indexOf(h) !== -1; }); }
+      var ci = { sku: idx(['sku', 'codigo']), name: idx(['name', 'nombre']), cat: idx(['cat', 'categoria']), loc: idx(['loc', 'ubicacion']), val: idx(['val', 'valor']), spec: idx(['spec', 'detalle']), desc: idx(['desc', 'descripcion']), qty: idx(['qty', 'cantidad', 'stock']), min: idx(['min', 'minimo']) };
+      if (ci.sku < 0 || ci.name < 0) { alert('El CSV necesita columnas sku y name (o nombre).'); return; }
+      var items = load(), nNew = 0, nUpd = 0, k;
+      function get(x, key, dflt) { return (ci[key] >= 0 && x[ci[key]] != null) ? String(x[ci[key]]).trim() : dflt; }
+      function num(x, key, dflt) { var v = parseInt(get(x, key, ''), 10); return isNaN(v) ? dflt : Math.max(0, v); }
+      for (var i = 1; i < rows.length; i++) {
+        var x = rows[i];
+        var sku = (x[ci.sku] || '').trim();
+        var name = (x[ci.name] || '').trim();
+        if (!sku || !name) continue;
+        var obj = { sku: sku, name: name, cat: get(x, 'cat', ''), loc: get(x, 'loc', ''), val: get(x, 'val', ''), spec: get(x, 'spec', ''), desc: get(x, 'desc', ''), qty: num(x, 'qty', 0), min: num(x, 'min', 0) };
+        var at = -1;
+        for (k = 0; k < items.length; k++) { if ((items[k].sku || '').toLowerCase() === sku.toLowerCase()) { at = k; break; } }
+        if (at >= 0) { items[at] = obj; nUpd++; } else { items.unshift(obj); nNew++; }
+        cloudPush(obj);
+        cloudTombstone(sku, true);
+      }
+      save(items); render();
+      cloudStatus('CSV: ' + nNew + ' nuevos, ' + nUpd + ' actualizados.');
+    } catch (e) { alert('No se pudo importar: ' + (e.message || e)); }
+  };
+  rd.readAsText(file);
+}
+$('btn-csv-exp').onclick = exportCSV;
+$('btn-csv-imp').onclick = function () { $('f-csv').click(); };
+$('f-csv').addEventListener('change', function (e) {
+  if (e.target.files && e.target.files[0]) importCSV(e.target.files[0]);
+  e.target.value = '';
+});
+
 function move(sku, d) {
   const items = load();
   const c = items.find((x) => x.sku === sku);
