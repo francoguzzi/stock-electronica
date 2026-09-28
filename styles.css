@@ -158,3 +158,17 @@ html[data-theme="dark"] .ai { background: rgba(0,122,255,.14); }
 .desc { color: var(--sub); }
 .qr { background: #fff; }
 @media (prefers-reduced-motion: reduce) { #card-form:not(.hidden) { animation: none; } button { transition: none; } button:active { transform: none; } }
+
+/* === Apple v3 compacto real: tipo contenida, tacto por padding === */
+header h1 { font-size: 1.25rem; font-weight: 700; }
+#btn-new { min-height: 44px; padding: 11px 16px; font-size: .95rem; }
+.card h2 { font-size: 1.05rem; }
+.top strong { font-size: 1rem; letter-spacing: 0; }
+.qty { font-size: 1.1rem; min-width: 48px; }
+.stepper button { width: 44px; height: 44px; min-width: 44px; min-height: 44px; font-size: 1.2rem; }
+.badge { font-size: .72rem; padding: 4px 8px; }
+.chip { min-height: 34px; font-size: .85rem; padding: 6px 12px; }
+.stats strong { font-size: 1.1rem; }
+.row-actions button { font-size: .88rem; }
+.meta { font-size: .85rem; }
+button.primary { font-size: 1rem; }
