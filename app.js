@@ -155,7 +155,7 @@ function render() {
       '<div class="meta"></div>' +
       '<div class="desc"></div>' +
       '<div class="qtybox"><div class="stepper"><button data-a="out">−</button><span class="qty"></span><button data-a="in">+</button></div><span class="min"></span></div>' +
-      '<div class="row-actions"><button data-a="in5">Entrada +5</button><button data-a="out1">Salida −1</button><button data-a="edit">Editar</button><button data-a="del" class="danger">Eliminar</button></div>';
+      '<div class="row-actions"><button data-a="in5">Entrada +5</button><button data-a="out1">Salida −1</button><button data-a="edit">Editar</button><button data-a="qr">QR</button><button data-a="del" class="danger">Eliminar</button></div>';
     li.querySelector('strong').textContent = c.name;
     li.querySelector('.meta').textContent = [c.sku, c.cat || 'Sin categoría', c.val || '', c.spec || '', c.loc || ''].filter(Boolean).join(' · ');
     li.querySelector('.desc').textContent = c.desc || '';
@@ -167,6 +167,7 @@ function render() {
     li.querySelector('[data-a="in5"]').onclick = () => move(c.sku, 5);
     li.querySelector('[data-a="out1"]').onclick = () => move(c.sku, -1);
     li.querySelector('[data-a="edit"]').onclick = () => startEdit(c.sku);
+    li.querySelector('[data-a="qr"]').onclick = () => toggleQR(li, c.sku);
     li.querySelector('[data-a="del"]').onclick = () => {
       if (confirm('¿Eliminar ' + c.name + '?')) del(c.sku);
     };
@@ -189,10 +190,13 @@ function renderBuy(all) {
     li.className = 'item low';
     li.innerHTML = '<div class="top"><strong></strong><span class="badge warn">Faltan: ' + need + '</span></div>' +
       '<div class="meta"></div>' +
-      '<div class="row-actions"><button data-a="bought">Comprado (+' + (need || 1) + ')</button></div>';
+      '<div class="row-actions"><button data-a="bought">Comprado (+' + (need || 1) + ')</button><button data-a="deld" class="danger">Eliminar</button></div>';
     li.querySelector('strong').textContent = c.name;
     li.querySelector('.meta').textContent = [c.sku, c.cat || '', 'quedan ' + c.qty + ' / mín ' + c.min, c.loc || ''].filter(Boolean).join(' · ');
     li.querySelector('[data-a="bought"]').onclick = () => move(c.sku, need || 1);
+    li.querySelector('[data-a="deld"]').onclick = () => {
+      if (confirm('Eliminar ' + c.name + '?')) del(c.sku);
+    };
     ul.appendChild(li);
   });
 }
@@ -213,6 +217,39 @@ function fallbackCopy(txt, done) {
   } catch {}
   prompt('Copiá la lista manualmente:', txt);
 }
+
+// QR por componente: se genera al verlo. Escaneando abre la app filtrada por ese SKU.
+function qrPayload(sku) {
+  try {
+    if (location.protocol.startsWith('http') && location.host) return location.origin + location.pathname + '?sku=' + encodeURIComponent(sku);
+  } catch {}
+  return 'STOCK:' + sku;
+}
+function toggleQR(li, sku) {
+  const box = li.querySelector('.qr');
+  box.classList.toggle('hidden');
+  if (!box.classList.contains('hidden') && !box.dataset.done) {
+    box.dataset.done = '1';
+    const url = qrPayload(sku);
+    if (typeof qrcode === 'function') {
+      try {
+        const qr = qrcode(0, 'M');
+        qr.addData(url);
+        qr.make();
+        box.innerHTML = qr.createSvgTag({ cellSize: 6, margin: 0, scalable: true }) + '<small></small>';
+        box.querySelector('small').textContent = url;
+      } catch { box.textContent = url; }
+    } else box.textContent = url + ' (QR offline no disponible: abri una vez con internet)';
+  }
+}
+// Deep-link ?sku=: al abrir, filtra por ese componente
+function applyDeepLink() {
+  try {
+    const sku = new URLSearchParams(location.search).get('sku');
+    if (sku && $('search')) { $('search').value = sku; render(); $('list').scrollIntoView({ block: 'start' }); }
+  } catch {}
+}
+
 function move(sku, d) {
   const items = load();
   const c = items.find((x) => x.sku === sku);
@@ -483,6 +520,7 @@ function renderSuggest() {
 }
 
 render();
+applyDeepLink();
 
 // Nube: UI + arranque
 $('btn-cloud').onclick = () => {
