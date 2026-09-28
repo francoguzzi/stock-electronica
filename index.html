@@ -40,7 +40,7 @@
       </div>
     </section>
     <section class="card hidden" id="card-form">
-      <h2>Nuevo componente</h2>
+      <h2 id="form-title">Nuevo componente</h2>
       <form id="form-add">
         <label>Nombre * <input id="f-name" placeholder="Ej: LM324N" required autocomplete="off" /></label>
         <div id="suggest" class="suggest hidden"></div>
@@ -71,12 +71,12 @@
           <label>Detalle <input id="f-spec" placeholder="Ej: 25V, 1/4W" autocomplete="off" /></label>
         </div>
         <div class="grid2">
-          <label>Cantidad inicial <input id="f-qty" type="number" min="0" value="0" /></label>
+          <label><span id="lbl-qty">Cantidad inicial</span> <input id="f-qty" type="number" min="0" value="0" /></label>
           <label>Avisar si baja de <input id="f-min" type="number" min="0" value="1" /></label>
         </div>
         <div class="form-actions">
           <button type="button" id="btn-cancel" class="ghost">Cancelar</button>
-          <button type="submit" class="primary">Guardar componente</button>
+          <button type="submit" class="primary" id="btn-save">Guardar componente</button>
         </div>
       </form>
     </section>
