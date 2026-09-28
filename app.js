@@ -208,8 +208,10 @@ function fallbackCopy(txt, done) {
   try {
     const ta = document.createElement('textarea');
     ta.value = txt; document.body.appendChild(ta); ta.select();
-    document.execCommand('copy'); document.body.removeChild(ta); done();
+    if (document.execCommand('copy')) { document.body.removeChild(ta); done(); return; }
+    document.body.removeChild(ta);
   } catch {}
+  prompt('Copiá la lista manualmente:', txt);
 }
 function move(sku, d) {
   const items = load();
