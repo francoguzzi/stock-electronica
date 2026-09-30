@@ -545,7 +545,7 @@ function refreshAI(src) {
     return;
   }
   const s = document.createElement('span');
-  let txt = (a.cat ? a.cat + ': ' : '') + a.desc;
+  let txt = (a.alias ? a.alias + ': ' : (a.cat ? a.cat + ': ' : '')) + a.desc;
   let pretty = a.specs;
   try { if (typeof prettySpecs === 'function') pretty = prettySpecs(a.specs); } catch {}
   const specTxt = Object.entries(pretty || {}).map(([k, v]) => k === 'len' ? 'Largo ' + v : k === 'size' ? 'Calibre ' + v : k === 'freq' ? 'Frec. ' + v : v).join(' ');

@@ -45,6 +45,22 @@ const KNOWLEDGE = [
   { keys: ["74LS32", "7432"], name: "74LS32", cat: "ICs", desc: "4 puertas lógicas OR de 2 entradas.", pkg: "DIP-14", min: 3 },
   { keys: ["74LS08", "7408"], name: "74LS08", cat: "ICs", desc: "4 puertas lógicas AND de 2 entradas.", pkg: "DIP-14", min: 3 },
   { keys: ["74LS595", "74595"], name: "74LS595", cat: "ICs", desc: "Registro de desplazamiento con latch para expandir salidas (LEDs, displays).", pkg: "DIP-16", min: 3 },
+  { keys: ["74LS02", "7402"], name: "74LS02", cat: "ICs", desc: "4 puertas NOR de 2 entradas.", pkg: "DIP-14", min: 3 },
+  { keys: ["74LS03", "7403"], name: "74LS03", cat: "ICs", desc: "4 puertas NOR con salida abierta (colector).", pkg: "DIP-14", min: 3 },
+  { keys: ["74LS06", "7406"], name: "74LS06", cat: "ICs", desc: "6 inversores con salida abierta (nivelación, LEDs).", pkg: "DIP-14", min: 3 },
+  { keys: ["74LS07", "7407"], name: "74LS07", cat: "ICs", desc: "6 buffers con salida abierta (colector).", pkg: "DIP-14", min: 3 },
+  { keys: ["74LS10", "7410"], name: "74LS10", cat: "ICs", desc: "3 puertas NAND de 3 entradas.", pkg: "DIP-14", min: 3 },
+  { keys: ["74LS11", "7411"], name: "74LS11", cat: "ICs", desc: "3 puertas AND de 3 entradas.", pkg: "DIP-14", min: 3 },
+  { keys: ["74LS20", "7420"], name: "74LS20", cat: "ICs", desc: "2 puertas NAND de 4 entradas.", pkg: "DIP-14", min: 3 },
+  { keys: ["74LS21", "7421"], name: "74LS21", cat: "ICs", desc: "2 puertas AND de 4 entradas.", pkg: "DIP-14", min: 3 },
+  { keys: ["74LS30", "7430"], name: "74LS30", cat: "ICs", desc: "1 puerta NAND de 8 entradas.", pkg: "DIP-14", min: 3 },
+  { keys: ["74LS86", "7486"], name: "74LS86", cat: "ICs", desc: "4 puertas XOR de 2 entradas.", pkg: "DIP-14", min: 3 },
+  { keys: ["74LS245", "74245"], name: "74LS245", cat: "ICs", desc: "8 transceptores de bus con enable (DIP-20).", pkg: "DIP-20", min: 2 },
+  { keys: ["74LS373", "74373"], name: "74LS373", cat: "ICs", desc: "Doble registro de 8 bits con enable (bus de datos).", pkg: "DIP-20", min: 2 },
+  { keys: ["74LS374", "74374"], name: "74LS374", cat: "ICs", desc: "Doble flip-flop D de 8 bits con clock.", pkg: "DIP-20", min: 2 },
+  { keys: ["74LS161", "74161"], name: "74LS161", cat: "ICs", desc: "Contador síncrono de 4 bits con carga paralelo.", pkg: "DIP-16", min: 2 },
+  { keys: ["74LS163", "74163"], name: "74LS163", cat: "ICs", desc: "Contador síncrono de 4 bits con clear síncrono.", pkg: "DIP-16", min: 2 },
+  { keys: ["74HC165", "74165"], name: "74HC165", cat: "ICs", desc: "Registro de entrada de 8 bits con carga paralelo (shift-in).", pkg: "DIP-16", min: 2 },
   { keys: ["MCP3008"], name: "MCP3008", cat: "ICs", desc: "Conversor ADC 10 bits de 8 canales por SPI.", pkg: "DIP-16", min: 1 },
   { keys: ["PCF8591"], name: "PCF8591", cat: "ICs", desc: "ADC/DAC de 8 bits por I2C.", pkg: "DIP-16", min: 1 },
   { keys: ["MAX485"], name: "MAX485", cat: "ICs", desc: "Transceptor RS485 para comunicación industrial.", pkg: "DIP-8", min: 2 },
@@ -413,6 +429,27 @@ function requiredFor(cat) {
   return [];
 }
 
+// La serie (HC/HCT/LS/AC/ACT/LVC) no define la función: si el usuario escribe
+// SN74HCT244N debe encontrar la 74LS244 y llamarse como la escribió.
+const P74PFX = /^(SN|DM|CD|HD|MC|TL|IL|HCF)/;
+const P74GRD = /^(74)(?:HCT|ACT|HC|AC|HFE|LS|LVC|CT|F|A)/;
+function code74Base(s) {
+  return (s || "").toUpperCase().replace(/[^A-Z0-9]/g, "").replace(P74PFX, "").replace(P74GRD, "$1").replace(/[A-Z]+$/, "");
+}
+function code74Name(s) {
+  const c = (s || "").toUpperCase().replace(/[^A-Z0-9]/g, "").replace(P74PFX, "").replace(/[A-Z]{1,3}$/, "");
+  return /^74/.test(c) ? c : "";
+}
+function hit74Grade(t) {
+  const m = t.match(/(?:^|[^A-Z0-9])((?:SN|DM|CD|HD|MC|TL|IL)?74(?:HCT|HC|ACT|AC|HFE|LS|LVC|CT)?\d{2,4})/);
+  if (!m) return null;
+  const base = code74Base(m[1]);
+  if (!/^74\d{2,4}$/.test(base)) return null;
+  const k = KNOWLEDGE.find((x) => (x.keys || []).some((key) => code74Base(key) === base)) || null;
+  if (!k) return null;
+  return { entry: k, name: code74Name(m[1]) || k.name };
+}
+
 function analyzePart(text) {
   const t = (text || "").toUpperCase().trim();
   if (t.length < 2) return null;
@@ -422,6 +459,14 @@ function analyzePart(text) {
     if (hit.specs) Object.assign(specs, hit.specs);
     const missing = requiredFor(hit.cat).filter(([k]) => !specs[k]).map(([, l]) => l);
     return { hit, cat: hit.cat, desc: hit.desc, pkg: hit.pkg, min: hit.min, specs, missing, confident: true };
+  }
+  // misma función, otra serie: SN74HCT244N -> 74LS244
+  const alt = hit74Grade(t);
+  if (alt) {
+    const k = alt.entry;
+    const specs = parseSpecs(t);
+    const missing = requiredFor(k.cat).filter(([x]) => !specs[x]).map(([, l]) => l);
+    return { hit: k, alias: alt.name, cat: k.cat, desc: k.desc, pkg: k.pkg, min: k.min, specs, missing, confident: true };
   }
   const brand = (BRANDS || []).find((b) => b.keys.some((key) => t.includes(key))) || null;
   if (brand) {
