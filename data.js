@@ -14,6 +14,7 @@ const KNOWLEDGE = [
   { keys: ["74HC74"], name: "74HC74", cat: "ICs", desc: "Doble flip-flop tipo D.", pkg: "DIP-14", min: 3 },
   { keys: ["CD4017", "4017"], name: "CD4017", cat: "ICs", desc: "Contador decimal: secuenciador de 10 salidas (luces, efectos).", pkg: "DIP-16", min: 3 },
   { keys: ["CD4060", "4060"], name: "CD4060", cat: "ICs", desc: "Contador con oscilador integrado para divisores de frecuencia.", pkg: "DIP-16", min: 3 },
+  { keys: ["CD4511", "4511"], name: "CD4511BE", cat: "ICs", desc: "Decodificador BCD a 7 segmentos con latch.", pkg: "DIP-16", min: 2 },
   { keys: ["ULN2003"], name: "ULN2003", cat: "ICs", desc: "Array de 7 transistores Darlington para relés, motores y cargas.", pkg: "DIP-16", min: 3 },
   { keys: ["ULN2803"], name: "ULN2803", cat: "ICs", desc: "Array de 8 transistores Darlington, primo grande del ULN2003.", pkg: "DIP-18", min: 2 },
   { keys: ["L293D", "L293"], name: "L293D", cat: "ICs", desc: "Doble puente H para motores DC chicos, hasta 600mA.", pkg: "DIP-16", min: 2 },
@@ -321,17 +322,17 @@ const BRANDS = [
 // Familias por patrón (cubre cientos de códigos sin listarlos uno por uno,
 // incluyendo escritura parcial: "TIP3", "BC54", "1N40", "74HC", "L78"...)
 const FAMILIES = [
-  { re: /\b74(HC|HCT|LS|AC|ACT|LVC)?\d{0,4}[A-Z]?\b/, cat: "ICs", desc: "IC lógico serie 74xx. Completá el código e indicá la función.", pkg: "DIP/SMD", min: 3 },
-  { re: /\bCD4\d{0,3}\b/, cat: "ICs", desc: "IC lógico CMOS serie 4000. Completá el código.", pkg: "DIP-16", min: 3 },
-  { re: /\b24C\d{2,3}\b/, cat: "ICs", desc: "Memoria EEPROM serie 24C. Completá el código.", pkg: "DIP-8", min: 2 },
-  { re: /\bL?78(\d{0,2})\b/, cat: "Reguladores", desc: "Regulador lineal positivo (el número es el voltaje).", pkg: "TO-220", min: 5, voltFrom: 1 },
-  { re: /\bL?79(\d{0,2})\b/, cat: "Reguladores", desc: "Regulador lineal negativo (el número es el voltaje).", pkg: "TO-220", min: 3, voltFrom: 1 },
+  { re: /\b74(HC|HCT|LS|AC|ACT|LVC)?\d{0,4}[A-Z]{0,2}\b/, cat: "ICs", desc: "IC lógico serie 74xx. Completá el código e indicá la función.", pkg: "DIP/SMD", min: 3 },
+  { re: /\bCD4\d{0,3}[A-Z]{0,2}\b/, cat: "ICs", desc: "IC lógico CMOS serie 4000. Completá el código.", pkg: "DIP-16", min: 3 },
+  { re: /\b24C\d{2,3}[A-Z]{0,2}\b/, cat: "ICs", desc: "Memoria EEPROM serie 24C. Completá el código.", pkg: "DIP-8", min: 2 },
+  { re: /\bL?78(\d{0,2})[A-Z]{0,2}\b/, cat: "Reguladores", desc: "Regulador lineal positivo (el número es el voltaje).", pkg: "TO-220", min: 5, voltFrom: 1 },
+  { re: /\bL?79(\d{0,2})[A-Z]{0,2}\b/, cat: "Reguladores", desc: "Regulador lineal negativo (el número es el voltaje).", pkg: "TO-220", min: 3, voltFrom: 1 },
   { re: /\bAMS1117-?(\d\.?\d?)?\b/, cat: "Reguladores", desc: "Regulador LDO de bajo dropout.", pkg: "SOT-223", min: 5, voltFrom: 1 },
-  { re: /\b1N\d{1,4}[A-Z]?\b/, cat: "Diodos / LED", desc: "Diodo serie 1N (400x rectificador, 4148 señal, 47xx zener, 58xx Schottky). Completá el código.", pkg: "DO-41", min: 10 },
-  { re: /\b(BC\d{0,3}|2N\d{0,5}|2S[ABCD]?\d*|BD\d{0,3}|TIP\d{0,4}|MPSA\d*|MPS2222A?|BCW\d*)\b/, cat: "Transistores", desc: "Transistor bipolar (verificá NPN/PNP en el datasheet).", pkg: "TO-92/220", min: 5 },
-  { re: /\b(IRF\d{0,4}[A-Z]*|IRL\w*|STP\d*\w*|FQP\d*\w*|AO\d+|SI\d+|2N7000|BS170)\b/, cat: "Transistores", desc: "MOSFET de potencia o señal (verificá canal N/P).", pkg: "TO-220/92", min: 5 },
-  { re: /\b(BT1[36]?\d?|BTA\d*|BTB\d*|TIC\d*|MAC\d*|MCR\d*|Q\d{0,4}L?\d?|TYN\d*|C106\w*)\b/, cat: "Tiristores", desc: "TRIAC o SCR para control de potencia AC/DC. Completá el código.", pkg: "TO-220/92", min: 4 },
-  { re: /\b(ATMEGA\d*\w*|ATTINY\d*|PIC\d*\w*|STM32\w*)\b/, cat: "ICs", desc: "Microcontrolador (chip). Si es placa, elegí Módulos / Placas.", pkg: "Varios", min: 2 },
+  { re: /\b1N\d{1,4}[A-Z]{0,2}\b/, cat: "Diodos / LED", desc: "Diodo serie 1N (400x rectificador, 4148 señal, 47xx zener, 58xx Schottky). Completá el código.", pkg: "DO-41", min: 10 },
+  { re: /\b(BC\d{0,3}|2N\d{0,5}|2S[ABCD]?\d*|BD\d{0,3}|TIP\d{0,4}|MPSA\d*|MPS2222A?|BCW\d*)[A-Z]{0,2}\b/, cat: "Transistores", desc: "Transistor bipolar (verificá NPN/PNP en el datasheet).", pkg: "TO-92/220", min: 5 },
+  { re: /\b(IRF\d{0,4}[A-Z]*|IRL\w*|STP\d*\w*|FQP\d*\w*|AO\d+[A-Z]{0,2}|SI\d+|2N7000|BS170)\b/, cat: "Transistores", desc: "MOSFET de potencia o señal (verificá canal N/P).", pkg: "TO-220/92", min: 5 },
+  { re: /\b(BT1[36]?\d?|BTA\d*|BTB\d*|TIC\d*|MAC\d*|MCR\d*|Q\d{0,4}L?\d?|TYN\d*|C106\w*)[A-Z]{0,2}\b/, cat: "Tiristores", desc: "TRIAC o SCR para control de potencia AC/DC. Completá el código.", pkg: "TO-220/92", min: 4 },
+  { re: /\b(ATMEGA\d*\w*|ATTINY\d*[A-Z]{0,2}|PIC\d*\w*|STM32\w*)\b/, cat: "ICs", desc: "Microcontrolador (chip). Si es placa, elegí Módulos / Placas.", pkg: "Varios", min: 2 },
 ];
 
 function parseSpecs(text) {
