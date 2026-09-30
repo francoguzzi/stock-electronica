@@ -24,15 +24,24 @@ const KNOWLEDGE = [
   { keys: ["DS1307"], name: "DS1307", cat: "ICs", desc: "Reloj de tiempo real económico con I2C.", pkg: "DIP-8", min: 2 },
   { keys: ["24LC256", "24C256", "EEPROM"], name: "24LC256", cat: "ICs", desc: "Memoria EEPROM 256 kbit por I2C.", pkg: "DIP-8", min: 2 },
   { keys: ["MAX232"], name: "MAX232", cat: "ICs", desc: "Convierte niveles TTL a RS232 (puerto serie).", pkg: "DIP-16", min: 2 },
+  { keys: ["24C02", "AT24C02"], name: "24C02", cat: "ICs", desc: "EEPROM I2C de 2 Kbit para guardar ajustes.", pkg: "DIP-8", min: 2 },
+  { keys: ["24C256", "AT24C256"], name: "24C256", cat: "ICs", desc: "EEPROM I2C de 256 Kbit (32 KB).", pkg: "DIP-8", min: 2 },
   { keys: ["LM741"], name: "LM741", cat: "ICs", desc: "Amplificador operacional clásico de una sola unidad.", pkg: "DIP-8", min: 3 },
   { keys: ["LM339", "LM393"], name: "LM339", cat: "ICs", desc: "Comparador cuádruple/doble para detectar umbrales.", pkg: "DIP-14", min: 3 },
-  { keys: ["TL072"], name: "TL072", cat: "ICs", desc: "Op-amp dual de bajo ruido para audio (JFET).", pkg: "DIP-8", min: 3 },
-  { keys: ["TL082"], name: "TL082", cat: "ICs", desc: "Op-amp dual de bajo ruido para audio (JFET, alta impedancia de entrada).", pkg: "DIP-8", min: 3 },
-  { keys: ["TL071"], name: "TL071", cat: "ICs", desc: "Op-amp simple de bajo ruido para audio (JFET).", pkg: "DIP-8", min: 3 },
-  { keys: ["TL081"], name: "TL081", cat: "ICs", desc: "Op-amp simple de bajo ruido para audio (JFET).", pkg: "DIP-8", min: 3 },
+  { keys: ["TL072", "TL082", "TL071", "TL081"], name: "TL072", cat: "ICs", desc: "Op-amp de bajo ruido para audio.", pkg: "DIP-8", min: 3 },
   { keys: ["CD4051", "4051"], name: "CD4051", cat: "ICs", desc: "Multiplexor analógico de 8 canales.", pkg: "DIP-16", min: 2 },
   { keys: ["74HC138"], name: "74HC138", cat: "ICs", desc: "Decodificador de 3 a 8 líneas.", pkg: "DIP-16", min: 2 },
   { keys: ["74LS47", "7447"], name: "74LS47", cat: "ICs", desc: "Driver BCD a display 7 segmentos.", pkg: "DIP-16", min: 2 },
+  { keys: ["74LS273", "DM74LS273", "74273"], name: "74LS273", cat: "ICs", desc: "Ocho flip-flop tipo D con clear común (registro de 8 bits).", pkg: "DIP-20", min: 2 },
+  { keys: ["74LS244"], name: "74LS244", cat: "ICs", desc: "Doble buffer/registro de 4 líneas con enable (bus de datos).", pkg: "DIP-20", min: 2 },
+  { keys: ["74LS393"], name: "74LS393", cat: "ICs", desc: "Doble contador binario de 4 bits.", pkg: "DIP-16", min: 2 },
+  { keys: ["74LS138", "74138"], name: "74LS138", cat: "ICs", desc: "Decodificador de 3 a 8 líneas.", pkg: "DIP-16", min: 2 },
+  { keys: ["74LS14"], name: "74LS14", cat: "ICs", desc: "Sexta puerta NOT con entrada Schmit (limpieza de ruido).", pkg: "DIP-14", min: 3 },
+  { keys: ["74LS00", "7400"], name: "74LS00", cat: "ICs", desc: "4 puertas lógicas NAND de 2 entradas.", pkg: "DIP-14", min: 4 },
+  { keys: ["74LS04", "7404"], name: "74LS04", cat: "ICs", desc: "6 inversores lógicos (NOT).", pkg: "DIP-14", min: 3 },
+  { keys: ["74LS32", "7432"], name: "74LS32", cat: "ICs", desc: "4 puertas lógicas OR de 2 entradas.", pkg: "DIP-14", min: 3 },
+  { keys: ["74LS08", "7408"], name: "74LS08", cat: "ICs", desc: "4 puertas lógicas AND de 2 entradas.", pkg: "DIP-14", min: 3 },
+  { keys: ["74LS595", "74595"], name: "74LS595", cat: "ICs", desc: "Registro de desplazamiento con latch para expandir salidas (LEDs, displays).", pkg: "DIP-16", min: 3 },
   { keys: ["MCP3008"], name: "MCP3008", cat: "ICs", desc: "Conversor ADC 10 bits de 8 canales por SPI.", pkg: "DIP-16", min: 1 },
   { keys: ["PCF8591"], name: "PCF8591", cat: "ICs", desc: "ADC/DAC de 8 bits por I2C.", pkg: "DIP-16", min: 1 },
   { keys: ["MAX485"], name: "MAX485", cat: "ICs", desc: "Transceptor RS485 para comunicación industrial.", pkg: "DIP-8", min: 2 },
@@ -91,7 +100,10 @@ const KNOWLEDGE = [
   // --- Tiristores / TRIACs ---
   { keys: ["Q6015L5", "Q6015"], name: "Q6015L5", cat: "Tiristores", desc: "TRIAC 15A 600V, compuerta sensible, para control de potencia AC (dimmers, motores).", pkg: "TO-220 aislado", min: 3, specs: { amps: "15A", volt: "600V" } },
   { keys: ["BT136"], name: "BT136", cat: "Tiristores", desc: "TRIAC 4A 600V para cargas AC pequeñas y dimmers.", pkg: "TO-220", min: 5 },
-  { keys: ["BT138", "BTA16", "BTA41", "BTB16"], name: "BT138", cat: "Tiristores", desc: "TRIAC 12A o más para cargas AC medias y grandes.", pkg: "TO-220 aislado", min: 4 },
+  { keys: ["BT138"], name: "BT138", cat: "Tiristores", desc: "TRIAC 4A/12A para cargas AC medias.", pkg: "TO-220 aislado", min: 4 },
+  { keys: ["BTA16"], name: "BTA16", cat: "Tiristores", desc: "TRIAC de potencia para cargas AC medias y grandes.", pkg: "TO-220 aislado", min: 4 },
+  { keys: ["BTA41"], name: "BTA41", cat: "Tiristores", desc: "TRIAC de gran potencia para cargas AC grandes.", pkg: "TO-220 aislado", min: 3 },
+  { keys: ["BTB16"], name: "BTB16", cat: "Tiristores", desc: "TRIAC de potencia para cargas AC medias y grandes.", pkg: "TO-220 aislado", min: 4 },
   { keys: ["TIC226"], name: "TIC226", cat: "Tiristores", desc: "TRIAC 8A 400/600V de uso general.", pkg: "TO-220", min: 4 },
   { keys: ["MAC97"], name: "MAC97", cat: "Tiristores", desc: "TRIAC pequeño 0.6A para disparo y señal.", pkg: "TO-92", min: 5 },
   { keys: ["MCR100", "2N5060", "SCR", "TIRISTOR"], name: "MCR100-6", cat: "Tiristores", desc: "SCR (tiristor unidireccional) sensible para control DC y pulsos.", pkg: "TO-92", min: 5 },
@@ -187,7 +199,6 @@ const KNOWLEDGE = [
   { keys: ["HM-10", "HM10", "BLUETOOTH 4.0", "BLE 4.0"], name: "HM-10", cat: "Módulos / Placas", desc: "Módulo Bluetooth Low Energy.", pkg: "Módulo", min: 1 },
   { keys: ["LORA", "RA-02", "SX1278", "SX1276"], name: "LoRa RA-02", cat: "Módulos / Placas", desc: "Radio LoRa de largo alcance.", pkg: "Módulo", min: 1 },
   { keys: ["FTDI", "CP2102", "CH340", "USB TTL", "PROGRAMADOR USB"], name: "USB-TTL", cat: "Módulos / Placas", desc: "Adaptador USB a serie TTL para programar placas.", pkg: "Módulo", min: 1 },
-  { keys: ["ST232", "ST-L232", "ST L232", "COM3", "RS232 TTL", "CONVERSOR RS232"], name: "ST-L232", cat: "Módulos / Placas", desc: "Conversor de puerto serie RS232 a nivel TTL (3,3/5 V) para conectar un piledriver a la PC.", pkg: "Módulo", min: 1 },
   { keys: ["MAX7219", "MATRIZ LED", "MATRIZ 8X8"], name: "MAX7219", cat: "Módulos / Placas", desc: "Driver para matriz LED 8x8 y displays por SPI.", pkg: "Módulo", min: 1 },
   { keys: ["TFT", "ILI9341", "ST7735"], name: "Display TFT", cat: "Módulos / Placas", desc: "Display TFT color por SPI.", pkg: "Módulo", min: 1 },
   { keys: ["MCP2515", "CAN BUS", "MODULO CAN"], name: "MCP2515", cat: "Módulos / Placas", desc: "Módulo CAN bus por SPI.", pkg: "Módulo", min: 1 },
@@ -326,11 +337,11 @@ const BRANDS = [
 // Familias por patrón (cubre cientos de códigos sin listarlos uno por uno,
 // incluyendo escritura parcial: "TIP3", "BC54", "1N40", "74HC", "L78"...)
 const FAMILIES = [
-  { re: /\b74(HC|HCT|LS|AC|ACT|LVC)?\d{0,4}[A-Z]{0,2}\b/, cat: "ICs", desc: "IC lógico serie 74xx. Completá el código e indicá la función.", pkg: "DIP/SMD", min: 3 },
-  { re: /\bCD4\d{0,3}[A-Z]{0,2}\b/, cat: "ICs", desc: "IC lógico CMOS serie 4000. Completá el código.", pkg: "DIP-16", min: 3 },
-  { re: /\b24C\d{2,3}[A-Z]{0,2}\b/, cat: "ICs", desc: "Memoria EEPROM serie 24C. Completá el código.", pkg: "DIP-8", min: 2 },
-  { re: /\bL?78(\d{0,2})[A-Z]{0,2}\b/, cat: "Reguladores", desc: "Regulador lineal positivo (el número es el voltaje).", pkg: "TO-220", min: 5, voltFrom: 1 },
-  { re: /\bL?79(\d{0,2})[A-Z]{0,2}\b/, cat: "Reguladores", desc: "Regulador lineal negativo (el número es el voltaje).", pkg: "TO-220", min: 3, voltFrom: 1 },
+  { re: /\b(?:DM|CD|HD|SN|MC|TL|IL|HCF)?74(?:HC|HCT|LS|AC|ACT|LVC|HFE)?\d{0,4}[A-Z]{0,2}\b/, cat: "ICs", desc: "IC lógico serie 74xx. Completá el código e indicá la función.", pkg: "DIP/SMD", min: 3 },
+  { re: /\b(?:MCC|HCF|SCL|SN)?CD4\d{0,3}[A-Z]{0,2}\b|\b(?:MCC|HCF|SCL)\d{4}[A-Z]{0,2}\b/, cat: "ICs", desc: "IC lógico CMOS serie 4000. Completá el código.", pkg: "DIP-16", min: 3 },
+  { re: /\b(?:AT)?24C\d{2,3}[A-Z]{0,2}\b/, cat: "ICs", desc: "Memoria EEPROM serie 24C. Completá el código.", pkg: "DIP-8", min: 2 },
+  { re: /\b(?:L|LM|UA|MC|HD|IL)?78[ML]?(\d{0,2})[A-Z]{0,2}\b/, cat: "Reguladores", desc: "Regulador lineal positivo (el número es el voltaje).", pkg: "TO-220", min: 5, voltFrom: 1 },
+  { re: /\b(?:L|LM|UA|MC|HD|IL)?79[ML]?(\d{0,2})[A-Z]{0,2}\b/, cat: "Reguladores", desc: "Regulador lineal negativo (el número es el voltaje).", pkg: "TO-220", min: 3, voltFrom: 1 },
   { re: /\bAMS1117-?(\d\.?\d?)?\b/, cat: "Reguladores", desc: "Regulador LDO de bajo dropout.", pkg: "SOT-223", min: 5, voltFrom: 1 },
   { re: /\b1N\d{1,4}[A-Z]{0,2}\b/, cat: "Diodos / LED", desc: "Diodo serie 1N (400x rectificador, 4148 señal, 47xx zener, 58xx Schottky). Completá el código.", pkg: "DO-41", min: 10 },
   { re: /\b(BC\d{0,3}|2N\d{0,5}|2S[ABCD]?\d*|BD\d{0,3}|TIP\d{0,4}|MPSA\d*|MPS2222A?|BCW\d*)[A-Z]{0,2}\b/, cat: "Transistores", desc: "Transistor bipolar (verificá NPN/PNP en el datasheet).", pkg: "TO-92/220", min: 5 },
@@ -372,7 +383,7 @@ function guessCat(t) {
   if (/MOSFET|IRF|IRL|TIP3|TIP4|BC54|BC55|2N22|2N39|TRANSIST|BD13|BD14/.test(t)) return "Transistores";
   if (/1N40|1N41|1N54|1N58|ZENER|DIODE|DIODO|LED|SCHOTTKY|PUENTE|BRIDGE/.test(t)) return "Diodos / LED";
   if (/DRIVER|A4988|DRV|L298|TMC22/.test(t)) return "Drivers";
-  if (/555|LM324|LM358|LM386|ULN200|ATMEGA|PIC\b|OPERACIONAL|LOGIC|74HC|CD40/.test(t)) return "ICs";
+  if (/555|LM324|LM358|LM386|ULN200|ATMEGA|PIC\b|OPERACIONAL|LOGIC|74\w*\d|CD40|DM74/.test(t)) return "ICs";
   if (/ESTAÑO|ESTANO|FLUX|FUNDENTE|SOLDAD|CAUTIN|MULTIMETRO|TESTER|PINZA|ALICATE|PELACABLES|KAPTON|TERMOCONTRAIBLE|HEAT SHRINK|PCB|PLAQUETA|PERFBOARD|FENOLICO|PORTAPILAS|DESOLDAD|CHUPON|TERCERA MANO|ISOPROPILICO|MALLA|TORNILLO|SEPARADOR|STANDOFF|HERRAMIENTA/.test(t)) return "Insumos";
   if (/ARDUINO|ESP32|ESP8266|\bESP\b|NANO\b|UNO\b|MEGA\b|PICO|PILL|DEVKIT|MODULO|MÓDULO|MODULE|BOARD|PLACA|SHIELD|SERVO|MOTOR|LCD|OLED|DISPLAY|TECLADO|KEYPAD|JOYSTICK|ENCODER|BLUETOOTH|WIFI|GSM|GPS|RFID|BATTERY|BATER/.test(t)) return "Módulos / Placas";
   if (/DHT|HC-SR04|HC-SR501|BMP|MPU|DS18B20|SENSOR|LDR|NTC|MQ-|HX711|PIR|ULTRASON/.test(t)) return "Sensores";
