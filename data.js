@@ -208,7 +208,12 @@ const KNOWLEDGE = [
   { keys: ["LED BICOLOR", "LED 2 COLORES"], name: "LED bicolor", cat: "Diodos / LED", desc: "LED de dos colores según polaridad.", pkg: "5mm", min: 10 },
   { keys: ["WS2812B", "NEOPIXEL", "TIRA LED"], name: "WS2812B", cat: "Diodos / LED", desc: "LED RGB direccionable para tiras y matrices.", pkg: "5050", min: 2 },
   { keys: ["LED SMD", "LED 0805", "LED 5050", "LED 0603"], name: "LED SMD", cat: "Diodos / LED", desc: "LED para montaje en PCB.", pkg: "SMD", min: 10 },
+  { keys: ["MATRIZ LED 8X8", "MATRIZ 8X8", "MATRIZ DE LEDS", "MATRIZ LEDS"], name: "Matriz LED 8x8", cat: "Diodos / LED", desc: "Matriz de LEDs 8x8 para texto y gráficos.", pkg: "Módulo", min: 1 },
   { keys: ["LED"], name: "LED 5mm", cat: "Diodos / LED", desc: "Diodo emisor de luz.", pkg: "5mm", min: 20 },
+  // --- Displays 7 segmentos con código (van antes del genérico "Display") ---
+  { keys: ["5643AS", "5643AS-1", "5643AS1", "5647BG", "5648AS", "5642AS", "5463AS", "5461AS", "5561AS", "3461AS", "2348AS"], name: "Display 4 dígitos", cat: "Diodos / LED", desc: "Display LED de 7 segmentos, 4 dígitos (0,56\"), cátodo común.", pkg: "Display", min: 4 },
+  { keys: ["1588BS", "1585BS", "1588BG", "1561BS"], name: "1588BS", cat: "Diodos / LED", desc: "Módulo display LED de 4 dígitos (7 segmentos) rojo.", pkg: "Display", min: 2 },
+  { keys: ["5161AS", "5641AS", "5161BG", "TOS-5121", "TOS5121", "5121BG", "LA-401", "LA401", "LA-501", "LA501", "EL-5101", "338AS", "5461AS-1"], name: "Display 1 dígito", cat: "Diodos / LED", desc: "Display LED de 7 segmentos, 1 dígito (ver color según sufijo).", pkg: "Display", min: 6 },
   { keys: ["7 SEGMENTOS", "7SEG", "DISPLAY", "TM1637"], name: "Display 7 segmentos", cat: "Diodos / LED", desc: "Display numérico LED, simple o módulo TM1637 con reloj.", pkg: "Varios", min: 2 },
   // --- Tiristores / TRIACs ---
   { keys: ["Q6015L5", "Q6015"], name: "Q6015L5", cat: "Tiristores", desc: "TRIAC 15A 600V, compuerta sensible, para control de potencia AC (dimmers, motores).", pkg: "TO-220 aislado", min: 3, specs: { amps: "15A", volt: "600V" } },
@@ -278,7 +283,7 @@ const KNOWLEDGE = [
   { keys: ["BLUE PILL", "STM32F103"], name: "Blue Pill STM32", cat: "Módulos / Placas", desc: "Placa ARM Cortex-M3 de 32 bits, potente y barata.", pkg: "Placa", min: 1 },
   { keys: ["RASPBERRY PICO", "RP2040", "PICO"], name: "Raspberry Pi Pico", cat: "Módulos / Placas", desc: "Placa dual-core ARM con MicroPython y C.", pkg: "Placa", min: 1 },
   { keys: ["ARDUINO LEONARDO", "LEONARDO"], name: "Arduino Leonardo", cat: "Módulos / Placas", desc: "Placa ATmega32U4 con USB nativo.", pkg: "Placa", min: 1 },
-  { keys: ["RASPBERRY PI", "RASPBERRY 4", "RASPBERRY ZERO", "RPI", "RASPBERRY 3"], name: "Raspberry Pi", cat: "Módulos / Placas", desc: "Microcomputadora para Linux y proyectos.", pkg: "Placa", min: 1 },
+  { keys: ["RASPBERRY PI", "RASPBERRY 4", "RASPBERRY ZERO", "RPI", "RPI3", "RPI4", "RASPBERRY 3"], name: "Raspberry Pi", cat: "Módulos / Placas", desc: "Microcomputadora para Linux y proyectos.", pkg: "Placa", min: 1 },
   { keys: ["BLACK PILL", "BLACKPILL", "STM32F401", "STM32F411"], name: "Black Pill", cat: "Módulos / Placas", desc: "Placa ARM Cortex-M4 potente.", pkg: "Placa", min: 1 },
   { keys: ["SIM7600", "4G LTE", "MODULO 4G"], name: "SIM7600", cat: "Módulos / Placas", desc: "Módulo 4G LTE para datos y GPS.", pkg: "Módulo", min: 1 },
   { keys: ["ADAPTADOR I2C", "BACKPACK LCD", "MOCHILA I2C"], name: "Backpack I2C", cat: "Módulos / Placas", desc: "Mochila I2C para LCD 16x2/20x4 (2 cables).", pkg: "Módulo", min: 1 },
@@ -311,9 +316,9 @@ const KNOWLEDGE = [
   { keys: ["PAM8403", "AMP 3W", "AMPLIFICADOR DIGITAL"], name: "PAM8403", cat: "Módulos / Placas", desc: "Amplificador digital estéreo 3W.", pkg: "Módulo", min: 1 },
   { keys: ["HM-10", "HM10", "BLUETOOTH 4.0", "BLE 4.0"], name: "HM-10", cat: "Módulos / Placas", desc: "Módulo Bluetooth Low Energy.", pkg: "Módulo", min: 1 },
   { keys: ["LORA", "RA-02", "SX1278", "SX1276"], name: "LoRa RA-02", cat: "Módulos / Placas", desc: "Radio LoRa de largo alcance.", pkg: "Módulo", min: 1 },
-  { keys: ["FTDI", "CP2102", "CH340", "USB TTL", "PROGRAMADOR USB"], name: "USB-TTL", cat: "Módulos / Placas", desc: "Adaptador USB a serie TTL para programar placas.", pkg: "Módulo", min: 1 },
+  { keys: ["FTDI", "CP2102", "CH340", "USB TTL", "USBTTL", "PROGRAMADOR USB"], name: "USB-TTL", cat: "Módulos / Placas", desc: "Adaptador USB a serie TTL para programar placas.", pkg: "Módulo", min: 1 },
   { keys: ["ST232", "ST-L232", "ST L232", "COM3", "RS232 TTL", "CONVERSOR RS232"], name: "ST-L232", cat: "Módulos / Placas", desc: "Conversor de puerto serie RS232 a nivel TTL (3,3/5 V) para conectar un piledriver a la PC.", pkg: "Módulo", min: 1 },
-  { keys: ["MAX7219", "MATRIZ LED", "MATRIZ 8X8"], name: "MAX7219", cat: "Módulos / Placas", desc: "Driver para matriz LED 8x8 y displays por SPI.", pkg: "Módulo", min: 1 },
+  { keys: ["MAX7219"], name: "MAX7219", cat: "Módulos / Placas", desc: "Driver para matriz LED 8x8 y displays por SPI.", pkg: "Módulo", min: 1 },
   { keys: ["TFT", "ILI9341", "ST7735"], name: "Display TFT", cat: "Módulos / Placas", desc: "Display TFT color por SPI.", pkg: "Módulo", min: 1 },
   { keys: ["MCP2515", "CAN BUS", "MODULO CAN"], name: "MCP2515", cat: "Módulos / Placas", desc: "Módulo CAN bus por SPI.", pkg: "Módulo", min: 1 },
   { keys: ["SSR", "RELE ESTADO SOLIDO", "SOLID STATE"], name: "Relé SSR", cat: "Módulos / Placas", desc: "Relé de estado sólido para conmutar AC sin chispa.", pkg: "Módulo", min: 1 },
@@ -462,6 +467,10 @@ const FAMILIES = [
   { re: /\b(IRF\d{0,4}[A-Z]*|IRL\w*|STP\d*\w*|FQP\d*\w*|AO\d+[A-Z]{0,2}|SI\d+|2N7000|BS170)\b/, cat: "Transistores", desc: "MOSFET de potencia o señal (verificá canal N/P).", pkg: "TO-220/92", min: 5 },
   { re: /\b(BT1[36]?\d?|BTA\d*|BTB\d*|TIC\d*|MAC\d*|MCR\d*|Q\d{0,4}L?\d?|TYN\d*|C106\w*)[A-Z]{0,2}\b/, cat: "Tiristores", desc: "TRIAC o SCR para control de potencia AC/DC. Completá el código.", pkg: "TO-220/92", min: 4 },
   { re: /\b(ATMEGA\d*\w*|ATTINY\d*[A-Z]{0,2}|PIC\d*\w*|STM32\w*)\b/, cat: "ICs", desc: "Microcontrolador (chip). Si es placa, elegí Módulos / Placas.", pkg: "Varios", min: 2 },
+  { re: /\b5[1-7]\d{2}(AS|BG)(?:-1)?\b/, cat: "Diodos / LED", desc: "Display LED de 7 segmentos de 1 a 4 dígitos (cátodo común).", pkg: "Display", min: 4 },
+  { re: /\b1[5-9]\d{2}B[SG]\b/, cat: "Diodos / LED", desc: "Módulo display LED de 4 dígitos (7 segmentos).", pkg: "Display", min: 2 },
+  { re: /\bLA-?\d{3}[A-Z]{0,3}\b/, cat: "Diodos / LED", desc: "Display LED de 7 segmentos de 1 dígito. Completá el código.", pkg: "Display", min: 6 },
+  { re: /\bTOS-?\d{4}[A-Z]{0,3}\b/, cat: "Diodos / LED", desc: "Display LED de 7 segmentos de 1 dígito. Completá el código.", pkg: "Display", min: 6 },
 ];
 
 function parseSpecs(text) {
@@ -546,12 +555,14 @@ function hit74Grade(t) {
   return { entry: k, name: code74Name(m[1]) || k.name };
 }
 
-// Un código 74xx/40xx solo matchea si no está pegado a otras letras o dígitos:
-// así "7402UF" o "17402" no se toman por un 74LS02. Los reguladores (7805) y
-// op-amps (LM358) sí van con prefijo pegado, así que no se les exige límite.
+// Una clave exige límite (no pegada a otras letras o dígitos) cuando es un
+// código de 4 dígitos (7402, 4011) o una sigla corta (LED, PLA, POT): así
+// "LEDS 1588BS" no es un LED 5mm, ni "PLACA" filamento PLA, ni "7402UF" un
+// 74LS02. Las claves mixtas (CD4011, 1N4007, 74LS244) y los reguladores de 3
+// dígitos (7805) se buscan como siempre, porque van con prefijo o sufijo.
 function hasKey(t, key) {
   if (!key || key.length < 3 || t.indexOf(key) === -1) return false;
-  if (!/^(74\d{2}|40\d{2})$/.test(key)) return true;
+  if (!/^[0-9]{4}$/.test(key) && !/^[A-ZÁÉÍÓÚÑ]{1,5}$/.test(key)) return true;
   let from = 0, at;
   while ((at = t.indexOf(key, from)) !== -1) {
     const prevOk = at === 0 || !/[A-Z0-9]/.test(t[at - 1]);
