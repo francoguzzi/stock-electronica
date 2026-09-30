@@ -61,6 +61,100 @@ const KNOWLEDGE = [
   { keys: ["74LS161", "74161"], name: "74LS161", cat: "ICs", desc: "Contador síncrono de 4 bits con carga paralelo.", pkg: "DIP-16", min: 2 },
   { keys: ["74LS163", "74163"], name: "74LS163", cat: "ICs", desc: "Contador síncrono de 4 bits con clear síncrono.", pkg: "DIP-16", min: 2 },
   { keys: ["74HC165", "74165"], name: "74HC165", cat: "ICs", desc: "Registro de entrada de 8 bits con carga paralelo (shift-in).", pkg: "DIP-16", min: 2 },
+  { keys: ["74LS193", "74193"], name: "74LS193", cat: "ICs", desc: "Contador binario síncrono de 4 bits, sube y baja, con carga paralelo.", pkg: "DIP-16", min: 2 },
+  { keys: ["74LS01", "7401"], name: "74LS01", cat: "ICs", desc: "4 puertas NAND de 2 entradas con salida abierta.", pkg: "DIP-14", min: 3 },
+  { keys: ["74LS05", "7405"], name: "74LS05", cat: "ICs", desc: "6 inversores lógicos con salida abierta.", pkg: "DIP-14", min: 3 },
+  { keys: ["74LS09", "7409"], name: "74LS09", cat: "ICs", desc: "4 puertas AND de 2 entradas con salida abierta.", pkg: "DIP-14", min: 3 },
+  { keys: ["74LS12", "7412"], name: "74LS12", cat: "ICs", desc: "3 puertas NAND de 3 entradas con salida abierta.", pkg: "DIP-14", min: 3 },
+  { keys: ["74LS13", "7413"], name: "74LS13", cat: "ICs", desc: "2 puertas NAND de 4 entradas con entrada Schmit.", pkg: "DIP-14", min: 2 },
+  { keys: ["74LS15", "7415"], name: "74LS15", cat: "ICs", desc: "2 puertas AND de 4 entradas con salida abierta.", pkg: "DIP-14", min: 2 },
+  { keys: ["74LS16", "7416"], name: "74LS16", cat: "ICs", desc: "6 inversores/buffers con salida abierta (nivelación).", pkg: "DIP-14", min: 3 },
+  { keys: ["74LS17", "7417"], name: "74LS17", cat: "ICs", desc: "6 buffers con salida abierta (colector).", pkg: "DIP-14", min: 3 },
+  { keys: ["74LS22", "7422"], name: "74LS22", cat: "ICs", desc: "4 puertas NOR de 2 entradas con salida abierta.", pkg: "DIP-14", min: 3 },
+  { keys: ["74LS23", "7423"], name: "74LS23", cat: "ICs", desc: "2 puertas NAND de 4 entradas con salida abierta.", pkg: "DIP-14", min: 2 },
+  { keys: ["74LS25", "7425"], name: "74LS25", cat: "ICs", desc: "2 puertas NOR de 4 entradas.", pkg: "DIP-14", min: 2 },
+  { keys: ["74LS26", "7426"], name: "74LS26", cat: "ICs", desc: "4 NAND de 2 entradas para tensión alta (15 V).", pkg: "DIP-14", min: 2 },
+  { keys: ["74LS27", "7427"], name: "74LS27", cat: "ICs", desc: "3 puertas NOR de 3 entradas.", pkg: "DIP-14", min: 3 },
+  { keys: ["74LS28", "7428"], name: "74LS28", cat: "ICs", desc: "4 puertas NOR de 2 entradas.", pkg: "DIP-14", min: 3 },
+  { keys: ["74LS33", "7433"], name: "74LS33", cat: "ICs", desc: "4 puertas OR de 2 entradas con salida abierta.", pkg: "DIP-14", min: 3 },
+  { keys: ["74LS37", "7437"], name: "74LS37", cat: "ICs", desc: "4 NAND de 2 entradas con salida abierta.", pkg: "DIP-14", min: 3 },
+  { keys: ["74LS38", "7438"], name: "74LS38", cat: "ICs", desc: "4 NAND de 2 entradas con salida abierta y 30 V.", pkg: "DIP-14", min: 3 },
+  { keys: ["74LS40", "7440"], name: "74LS40", cat: "ICs", desc: "2 puertas NAND de 4 entradas con salida abierta.", pkg: "DIP-14", min: 2 },
+  { keys: ["74LS42", "7442"], name: "74LS42", cat: "ICs", desc: "Decodificador BCD a decimal (1 de 10).", pkg: "DIP-16", min: 2 },
+  { keys: ["74LS43", "7443"], name: "74LS43", cat: "ICs", desc: "Decodificador BCD a decimal con salida abierta.", pkg: "DIP-16", min: 2 },
+  { keys: ["74LS45", "7445"], name: "74LS45", cat: "ICs", desc: "Decodificador BCD a 1 de 10 con salida abierta (para displays).", pkg: "DIP-16", min: 2 },
+  { keys: ["74LS48", "7448"], name: "74LS48", cat: "ICs", desc: "Decodificador BCD a 7 segmentos (ánodo común).", pkg: "DIP-16", min: 2 },
+  { keys: ["74LS64", "7464"], name: "74LS64", cat: "ICs", desc: "Selector de línea / multiplexor 4 a 1.", pkg: "DIP-14", min: 2 },
+  { keys: ["74LS85", "7485"], name: "74LS85", cat: "ICs", desc: "Comparador de magnitud de 4 bits.", pkg: "DIP-14", min: 2 },
+  { keys: ["74LS93", "7493"], name: "74LS93", cat: "ICs", desc: "Contador binario de 4 bits en dos bloques.", pkg: "DIP-14", min: 3 },
+  { keys: ["74LS95", "7495"], name: "74LS95", cat: "ICs", desc: "Registro de desplazamiento de 4 bits (serial y paralelo).", pkg: "DIP-14", min: 2 },
+  { keys: ["74LS107", "74107"], name: "74LS107", cat: "ICs", desc: "3 buffers de 3 entradas con salida abierta.", pkg: "DIP-14", min: 2 },
+  { keys: ["74LS109", "74109"], name: "74LS109", cat: "ICs", desc: "2 flip-flop JK con flanco positivo y clear.", pkg: "DIP-16", min: 2 },
+  { keys: ["74LS112", "74112"], name: "74LS112", cat: "ICs", desc: "2 flip-flop JK con flanco negativo y clear.", pkg: "DIP-16", min: 2 },
+  { keys: ["74LS113", "74113"], name: "74LS113", cat: "ICs", desc: "2 flip-flop JK con flanco negativo.", pkg: "DIP-16", min: 2 },
+  { keys: ["74LS121", "74121"], name: "74LS121", cat: "ICs", desc: "Multivibrador monostable (un pulso de ancho fijo).", pkg: "DIP-14", min: 2 },
+  { keys: ["74LS122", "74122"], name: "74LS122", cat: "ICs", desc: "Monostable disparable (ancho ajustable).", pkg: "DIP-16", min: 2 },
+  { keys: ["74LS123", "74123"], name: "74LS123", cat: "ICs", desc: "2 multivibradores monostables disparables.", pkg: "DIP-16", min: 2 },
+  { keys: ["74LS125", "74125"], name: "74LS125", cat: "ICs", desc: "4 buffers tri-estado con habilitación (bus de datos).", pkg: "DIP-14", min: 3 },
+  { keys: ["74LS126", "74126"], name: "74LS126", cat: "ICs", desc: "4 buffers tri-estado con enable.", pkg: "DIP-14", min: 3 },
+  { keys: ["74LS132", "74132"], name: "74LS132", cat: "ICs", desc: "4 NAND de 2 entradas con entrada Schmit.", pkg: "DIP-14", min: 3 },
+  { keys: ["74LS136", "74136"], name: "74LS136", cat: "ICs", desc: "Multiplexor 4 a 1 con salida abierta.", pkg: "DIP-14", min: 2 },
+  { keys: ["74LS139", "74139"], name: "74LS139", cat: "ICs", desc: "2 decodificadores de 2 a 4 líneas.", pkg: "DIP-16", min: 2 },
+  { keys: ["74LS148", "74148"], name: "74LS148", cat: "ICs", desc: "Codificador de prioridad de 8 a 3 líneas.", pkg: "DIP-16", min: 2 },
+  { keys: ["74LS151", "74151"], name: "74LS151", cat: "ICs", desc: "Multiplexor 8 a 1 con selección.", pkg: "DIP-14", min: 2 },
+  { keys: ["74LS153", "74153"], name: "74LS153", cat: "ICs", desc: "2 multiplexores 4 a 1 con selección.", pkg: "DIP-14", min: 2 },
+  { keys: ["74LS154", "74154"], name: "74LS154", cat: "ICs", desc: "Decodificador de 4 a 16 líneas.", pkg: "DIP-24", min: 2 },
+  { keys: ["74LS155", "74155"], name: "74LS155", cat: "ICs", desc: "2 decodificadores de 2 a 4 líneas.", pkg: "DIP-16", min: 2 },
+  { keys: ["74LS157", "74157"], name: "74LS157", cat: "ICs", desc: "4 multiplexores 2 a 1.", pkg: "DIP-14", min: 3 },
+  { keys: ["74LS160", "74160"], name: "74LS160", cat: "ICs", desc: "Contador BCD síncrono de 4 bits con carga.", pkg: "DIP-16", min: 2 },
+  { keys: ["74LS162", "74162"], name: "74LS162", cat: "ICs", desc: "Contador binario síncrono de 4 bits con clear síncrono.", pkg: "DIP-16", min: 2 },
+  { keys: ["74LS164", "74164"], name: "74LS164", cat: "ICs", desc: "Registro de desplazamiento de 8 bits, serial a paralelo.", pkg: "DIP-14", min: 3 },
+  { keys: ["74LS169", "74169"], name: "74LS169", cat: "ICs", desc: "Contador binario de 4 bits, ascendente y descendente.", pkg: "DIP-16", min: 2 },
+  { keys: ["74LS173", "74173"], name: "74LS173", cat: "ICs", desc: "2 contadores binarios de 4 bits con clear.", pkg: "DIP-16", min: 2 },
+  { keys: ["74LS174", "74174"], name: "74LS174", cat: "ICs", desc: "2 registros D de 4 bits con clear y clock común.", pkg: "DIP-16", min: 2 },
+  { keys: ["74LS175", "74175"], name: "74LS175", cat: "ICs", desc: "2 registros D de 4 bits con habilitación.", pkg: "DIP-16", min: 2 },
+  { keys: ["74LS181", "74181"], name: "74LS181", cat: "ICs", desc: "ALU de 4 bits (suma, resta, lógica).", pkg: "DIP-24", min: 1 },
+  { keys: ["74LS190", "74190"], name: "74LS190", cat: "ICs", desc: "Contador decimal ascendente/descendente con carga.", pkg: "DIP-16", min: 2 },
+  { keys: ["74LS192", "74192"], name: "74LS192", cat: "ICs", desc: "Contador decimal ascendente/descendente con clear.", pkg: "DIP-16", min: 2 },
+  { keys: ["74LS195", "74195"], name: "74LS195", cat: "ICs", desc: "Registro de 4 bits, paralelo a serie.", pkg: "DIP-16", min: 2 },
+  { keys: ["74LS200", "74200"], name: "74LS200", cat: "ICs", desc: "NAND de 8 entradas con salida abierta.", pkg: "DIP-14", min: 2 },
+  { keys: ["74LS240", "74240"], name: "74LS240", cat: "ICs", desc: "8 inversores tri-estado (bus de datos).", pkg: "DIP-20", min: 2 },
+  { keys: ["74LS241", "74241"], name: "74LS241", cat: "ICs", desc: "8 buffers tri-estado (bus de datos).", pkg: "DIP-20", min: 2 },
+  { keys: ["74LS283", "74283"], name: "74LS283", cat: "ICs", desc: "Sumador binario de 4 bits.", pkg: "DIP-16", min: 2 },
+  // --- CMOS 4000 (con prefijo de fabricante: CD, MC, HCF...) ---
+  { keys: ["CD4001", "4001", "MC14001"], name: "CD4001", cat: "ICs", desc: "4 puertas NOR de 2 entradas.", pkg: "DIP-14", min: 4 },
+  { keys: ["CD4011", "4011", "MC14011"], name: "CD4011", cat: "ICs", desc: "4 puertas NAND de 2 entradas.", pkg: "DIP-14", min: 5 },
+  { keys: ["CD4012", "4012"], name: "CD4012", cat: "ICs", desc: "2 puertas NAND de 4 entradas.", pkg: "DIP-14", min: 3 },
+  { keys: ["CD4023", "4023"], name: "CD4023", cat: "ICs", desc: "3 puertas NAND de 3 entradas.", pkg: "DIP-14", min: 3 },
+  { keys: ["CD4025", "4025"], name: "CD4025", cat: "ICs", desc: "3 puertas NOR de 3 entradas.", pkg: "DIP-14", min: 3 },
+  { keys: ["CD4027", "4027"], name: "CD4027", cat: "ICs", desc: "2 flip-flop JK con set y reset.", pkg: "DIP-16", min: 3 },
+  { keys: ["CD4028", "4028"], name: "CD4028", cat: "ICs", desc: "Decodificador BCD a 8 líneas.", pkg: "DIP-16", min: 2 },
+  { keys: ["CD4030", "4030"], name: "CD4030", cat: "ICs", desc: "4 puertas XOR de 2 entradas.", pkg: "DIP-14", min: 3 },
+  { keys: ["CD4040", "4040"], name: "CD4040", cat: "ICs", desc: "Contador binario de 12 bits en cascada.", pkg: "DIP-16", min: 2 },
+  { keys: ["CD4042", "4042"], name: "CD4042", cat: "ICs", desc: "Contador de 7 etapas (divisor por 128).", pkg: "DIP-16", min: 2 },
+  { keys: ["CD4049", "4049"], name: "CD4049", cat: "ICs", desc: "6 inversores (buffer de salida fuerte).", pkg: "DIP-16", min: 3 },
+  { keys: ["CD4050", "4050"], name: "CD4050", cat: "ICs", desc: "2 buffers de 3 entradas (nivelación).", pkg: "DIP-16", min: 2 },
+  { keys: ["CD4052", "4052"], name: "CD4052", cat: "ICs", desc: "2 multiplexores 4 a 1.", pkg: "DIP-16", min: 2 },
+  { keys: ["CD4053", "4053"], name: "CD4053", cat: "ICs", desc: "3 multiplexores 3 a 2.", pkg: "DIP-16", min: 2 },
+  { keys: ["CD4054", "4054"], name: "CD4054", cat: "ICs", desc: "Registro de desplazamiento bidireccional de 4 bits.", pkg: "DIP-16", min: 2 },
+  { keys: ["CD4056", "4056"], name: "CD4056", cat: "ICs", desc: "Decodificador 1 de 16 salidas.", pkg: "DIP-16", min: 2 },
+  { keys: ["CD4063", "4063"], name: "CD4063", cat: "ICs", desc: "Comparador de magnitud de 6 bits.", pkg: "DIP-16", min: 2 },
+  { keys: ["CD4066", "4066"], name: "CD4066", cat: "ICs", desc: "4 interruptores bilaterales (analógicos).", pkg: "DIP-14", min: 3 },
+  { keys: ["CD4068", "4068"], name: "CD4068", cat: "ICs", desc: "Puerta AND de 8 entradas.", pkg: "DIP-14", min: 2 },
+  { keys: ["CD4069", "4069"], name: "CD4069", cat: "ICs", desc: "6 inversores.", pkg: "DIP-14", min: 4 },
+  { keys: ["CD4070", "4070"], name: "CD4070", cat: "ICs", desc: "4 NOR de 2 entradas con entrada Schmit (oscilador).", pkg: "DIP-14", min: 3 },
+  { keys: ["CD4071", "4071"], name: "CD4071", cat: "ICs", desc: "4 buffers de 2 entradas.", pkg: "DIP-14", min: 3 },
+  { keys: ["CD4073", "4073"], name: "CD4073", cat: "ICs", desc: "3 NAND de 3 entradas.", pkg: "DIP-14", min: 3 },
+  { keys: ["CD4075", "4075"], name: "CD4075", cat: "ICs", desc: "3 OR de 3 entradas.", pkg: "DIP-14", min: 3 },
+  { keys: ["CD4077", "4077"], name: "CD4077", cat: "ICs", desc: "4 puertas XOR de 2 entradas con salida abierta.", pkg: "DIP-14", min: 2 },
+  { keys: ["CD4081", "4081", "MC14081"], name: "CD4081", cat: "ICs", desc: "4 puertas AND de 2 entradas.", pkg: "DIP-14", min: 4 },
+  { keys: ["CD4093", "4093"], name: "CD4093", cat: "ICs", desc: "4 NAND de 2 entradas con entrada Schmit (oscilador).", pkg: "DIP-14", min: 4 },
+  { keys: ["CD4094", "4094"], name: "CD4094", cat: "ICs", desc: "Registro serial a paralelo de 8 bits.", pkg: "DIP-14", min: 2 },
+  { keys: ["CD4098", "4098"], name: "CD4098", cat: "ICs", desc: "Registro de 8 bits con set paralelo.", pkg: "DIP-14", min: 2 },
+  { keys: ["CD4107", "4107"], name: "CD4107", cat: "ICs", desc: "3 OR de 3 entradas con salida abierta.", pkg: "DIP-14", min: 2 },
+  { keys: ["CD4111", "4111"], name: "CD4111", cat: "ICs", desc: "2 puertas NOR de 8 entradas.", pkg: "DIP-14", min: 2 },
+  { keys: ["CD4151", "4151"], name: "CD4151", cat: "ICs", desc: "Multiplexor 8 a 1.", pkg: "DIP-16", min: 2 },
+  { keys: ["CD4174", "4174"], name: "CD4174", cat: "ICs", desc: "Contador de 7 etapas con reset.", pkg: "DIP-16", min: 2 },
   { keys: ["MCP3008"], name: "MCP3008", cat: "ICs", desc: "Conversor ADC 10 bits de 8 canales por SPI.", pkg: "DIP-16", min: 1 },
   { keys: ["PCF8591"], name: "PCF8591", cat: "ICs", desc: "ADC/DAC de 8 bits por I2C.", pkg: "DIP-16", min: 1 },
   { keys: ["MAX485"], name: "MAX485", cat: "ICs", desc: "Transceptor RS485 para comunicación industrial.", pkg: "DIP-8", min: 2 },
@@ -443,6 +537,8 @@ function code74Name(s) {
 function hit74Grade(t) {
   const m = t.match(/(?:^|[^A-Z0-9])((?:SN|DM|CD|HD|MC|TL|IL)?74(?:HCT|HC|ACT|AC|HFE|LS|LVC|CT)?\d{2,4})/);
   if (!m) return null;
+  // "7402UF" es un.capacitor, no un 74LS02
+  if (/^(UF|NF|PF|MF|OHM|OHMS|KOHM|MHZ|MM|V|A|W)\b/.test(t.slice(m.index + m[0].length))) return null;
   const base = code74Base(m[1]);
   if (!/^74\d{2,4}$/.test(base)) return null;
   const k = KNOWLEDGE.find((x) => (x.keys || []).some((key) => code74Base(key) === base)) || null;
@@ -450,10 +546,27 @@ function hit74Grade(t) {
   return { entry: k, name: code74Name(m[1]) || k.name };
 }
 
+// Un código 74xx/40xx solo matchea si no está pegado a otras letras o dígitos:
+// así "7402UF" o "17402" no se toman por un 74LS02. Los reguladores (7805) y
+// op-amps (LM358) sí van con prefijo pegado, así que no se les exige límite.
+function hasKey(t, key) {
+  if (!key || key.length < 3 || t.indexOf(key) === -1) return false;
+  if (!/^(74\d{2}|40\d{2})$/.test(key)) return true;
+  let from = 0, at;
+  while ((at = t.indexOf(key, from)) !== -1) {
+    const prevOk = at === 0 || !/[A-Z0-9]/.test(t[at - 1]);
+    const end = at + key.length;
+    const nextOk = end >= t.length || !/[A-Z0-9]/.test(t[end]);
+    if (prevOk && nextOk) return true;
+    from = at + 1;
+  }
+  return false;
+}
+
 function analyzePart(text) {
   const t = (text || "").toUpperCase().trim();
   if (t.length < 2) return null;
-  const hit = KNOWLEDGE.find((k) => k.keys.some((key) => key.length >= 3 && t.includes(key))) || null;
+  const hit = KNOWLEDGE.find((k) => (k.keys || []).some((key) => hasKey(t, key))) || null;
   if (hit) {
     const specs = parseSpecs(t);
     if (hit.specs) Object.assign(specs, hit.specs);
