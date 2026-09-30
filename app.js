@@ -63,7 +63,8 @@ function rtStart() {
   } catch {}
 }
 function rtStop() { try { if (RT && SB) SB.removeChannel(RT); } catch {} RT = null; }
-// Cola de pendientes: sobrevive offline y se vacía sola al reconectar
+// Cola de pendientes: sobrevive offline y se vacía sola al reconectar (arregla
+// borrados/ediciones que antes se perdían o se pisaban con la nube vieja)
 const PEND_KEY = 'stock_pending_v1';
 const loadPend = () => { try { return JSON.parse(localStorage.getItem(PEND_KEY)) || { up: {}, del: {} }; } catch { return { up: {}, del: {} }; } };
 const savePend = (p) => { try { localStorage.setItem(PEND_KEY, JSON.stringify(p)); } catch {} };
@@ -92,19 +93,21 @@ async function cloudPull() {
   if (!cloudOk && !(await cloudConnect(true))) { cloudStatus('Sin nube: trabajo local.'); return; }
   await flushPending();
   try {
-    const got = await SB.from('components').select('*');
-    const tbs = await SB.from('deleted_skus').select('sku');
+    const [got, tbs] = await Promise.all([
+      SB.from('components').select('*'),
+      SB.from('deleted_skus').select('sku')
+    ]);
     if (got.error) throw got.error;
     if (tbs.error) throw tbs.error;
-    const tombs = new Set((tbs.data || []).map((x) => x.sku));
-    const rows = (got.data || []).map(fromRow).filter((x) => !tombs.has(x.sku));
+    const tombs = new Set((tbs.data || []).map((r) => r.sku));
+    const rows = (got.data || []).map(fromRow).filter((r) => !tombs.has(r.sku));
     const bySku = new Map(rows.map((r) => [r.sku, r]));
     const base = (MEM && MEM.length ? MEM : loadLocal()).filter((m) => !tombs.has(m.sku));
     const merged = [];
     const missing = [];
     for (const m of base) {
       if (bySku.has(m.sku)) merged.push(bySku.get(m.sku));
-      else { merged.push(m); missing.push(m); }
+      else { merged.push(m); missing.push(m); } // no está en la nube: conservar y reintentar subida
     }
     for (const r of rows) if (!merged.some((x) => x.sku === r.sku)) merged.push(r);
     MEM = merged;
@@ -226,7 +229,7 @@ function renderBuy(all) {
     li.querySelector('.meta').textContent = [c.sku, c.cat || '', 'quedan ' + c.qty + ' / mín ' + c.min, c.loc || ''].filter(Boolean).join(' · ');
     li.querySelector('[data-a="bought"]').onclick = () => move(c.sku, need || 1);
     li.querySelector('[data-a="deld"]').onclick = () => {
-      if (confirm('Eliminar ' + c.name + '?')) del(c.sku);
+      if (confirm('¿Eliminar ' + c.name + '?')) del(c.sku);
     };
     ul.appendChild(li);
   });
@@ -234,7 +237,7 @@ function renderBuy(all) {
 $('btn-buy').onclick = () => $('card-buy').classList.toggle('hidden');
 $('btn-buy-copy').onclick = () => {
   const needy = load().filter((c) => c.qty <= c.min);
-  const txt = needy.map((c) => '- ' + c.name + ' (' + c.sku + ') x' + (buyNeed(c) || 1)).join('\n');
+  const txt = needy.map((c) => '- ' + c.name + ' (' + c.sku + ') x' + (buyNeed(c) || 1)).join('\n') || 'Nada que comprar.';
   const done = () => { $('btn-buy-copy').textContent = 'Copiado'; setTimeout(() => { $('btn-buy-copy').textContent = 'Copiar lista'; }, 1500); };
   if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(done).catch(() => fallbackCopy(txt, done));
   else fallbackCopy(txt, done);
@@ -249,7 +252,8 @@ function fallbackCopy(txt, done) {
   prompt('Copiá la lista manualmente:', txt);
 }
 
-// QR por componente: se genera al verlo. Escaneando abre la app filtrada por ese SKU.
+// QR por componente: se genera al verlo (crear/editar no necesitan nada extra).
+// Escaneando abre la app filtrada por ese SKU.
 function qrPayload(sku) {
   try {
     if (location.protocol.startsWith('http') && location.host) return location.origin + location.pathname + '?sku=' + encodeURIComponent(sku);
@@ -270,7 +274,7 @@ function toggleQR(li, sku) {
         box.querySelector('small').textContent = url;
         box.dataset.done = '1';
       } catch { box.textContent = url; }
-    } else box.textContent = url + ' (QR offline no disponible: abri una vez con internet)';
+    } else box.textContent = url + ' (QR offline no disponible: abrí una vez con internet)';
   }
 }
 // Deep-link ?sku=: al abrir, filtra por ese componente
@@ -324,8 +328,8 @@ function parseCSV(text) {
     else field += ch;
   }
   row.push(field); rows.push(row);
-  var out = rows.filter(function (x) { return x.length > 1 || (x[0] || '').trim() !== ''; });
-  out.warned = inQ;
+  var out = rows.filter(function (r) { return r.length > 1 || (r[0] || '').trim() !== ''; });
+  out.warned = inQ; // comilla sin cerrar: se importó igual, avisar
   return out;
 }
 function detectDelim(head) {
@@ -347,17 +351,27 @@ function importCSV(file) {
       if (!rows.length) { alert('CSV vacío.'); return; }
       var head = rows[0].map(function (h) { return (h || '').trim().toLowerCase(); });
       function idx(names) { return head.findIndex(function (h) { return names.indexOf(h) !== -1; }); }
-      var ci = { sku: idx(['sku', 'codigo', 'código']), name: idx(['name', 'nombre']), cat: idx(['cat', 'categoria', 'categoría']), loc: idx(['loc', 'ubicacion', 'ubicación']), val: idx(['val', 'valor']), spec: idx(['spec', 'detalle']), desc: idx(['desc', 'descripcion', 'descripción']), qty: idx(['qty', 'cantidad', 'stock']), min: idx(['min', 'minimo', 'mínimo']) };
+      var ci = {
+        sku: idx(['sku', 'codigo', 'código']),
+        name: idx(['name', 'nombre']),
+        cat: idx(['cat', 'categoria', 'categoría']),
+        loc: idx(['loc', 'ubicacion', 'ubicación']),
+        val: idx(['val', 'valor']),
+        spec: idx(['spec', 'detalle']),
+        desc: idx(['desc', 'descripcion', 'descripción']),
+        qty: idx(['qty', 'cantidad', 'stock']),
+        min: idx(['min', 'minimo', 'mínimo'])
+      };
       if (ci.sku < 0 || ci.name < 0) { alert('El CSV necesita columnas sku y name (o nombre).'); return; }
       var items = load(), nNew = 0, nUpd = 0, k;
-      function get(x, key, dflt) { return (ci[key] >= 0 && x[ci[key]] != null) ? String(x[ci[key]]).trim() : dflt; }
-      function num(x, key, dflt) { var v = parseInt(get(x, key, ''), 10); return isNaN(v) ? dflt : Math.max(0, v); }
+      function get(r, key, dflt) { return (ci[key] >= 0 && r[ci[key]] != null) ? String(r[ci[key]]).trim() : dflt; }
+      function num(r, key, dflt) { var v = parseInt(get(r, key, ''), 10); return isNaN(v) ? dflt : Math.max(0, v); }
       for (var i = 1; i < rows.length; i++) {
-        var x = rows[i];
-        var sku = (x[ci.sku] || '').trim();
-        var name = (x[ci.name] || '').trim();
+        var r = rows[i];
+        var sku = (r[ci.sku] || '').trim();
+        var name = (r[ci.name] || '').trim();
         if (!sku || !name) continue;
-        var obj = { sku: sku, name: name, cat: get(x, 'cat', ''), loc: get(x, 'loc', ''), val: get(x, 'val', ''), spec: get(x, 'spec', ''), desc: get(x, 'desc', ''), qty: num(x, 'qty', 0), min: num(x, 'min', 0) };
+        var obj = { sku: sku, name: name, cat: get(r, 'cat', ''), loc: get(r, 'loc', ''), val: get(r, 'val', ''), spec: get(r, 'spec', ''), desc: get(r, 'desc', ''), qty: num(r, 'qty', 0), min: num(r, 'min', 0) };
         var at = -1;
         for (k = 0; k < items.length; k++) { if ((items[k].sku || '').toLowerCase() === sku.toLowerCase()) { at = k; break; } }
         if (at >= 0) { items[at] = obj; nUpd++; } else { items.unshift(obj); nNew++; }
@@ -402,6 +416,8 @@ function toggleForm(show) {
   $('card-form').classList.toggle('hidden', !show);
   if (show) $('f-name').focus();
 }
+
+// Edición: precarga el formulario y guarda sobre el mismo SKU (el SKU no se cambia)
 function startEdit(sku) {
   const c = load().find((x) => x.sku === sku);
   if (!c) return;
@@ -461,7 +477,16 @@ $('form-add').addEventListener('submit', (e) => {
   if (editingSku) {
     const i = items.findIndex((x) => x.sku === editingSku);
     if (i < 0) { resetEdit(); return; }
-    items[i] = { sku: editingSku, name, cat: $('f-cat').value, loc: $('f-loc').value.trim(), val: normVal(), spec: normSpec(), desc: buildDesc(name, editingSku), qty: numVal($('f-qty').value, 0), min: numVal($('f-min').value, 0) };
+    items[i] = {
+      sku: editingSku,
+      name,
+      cat: $('f-cat').value,
+      loc: $('f-loc').value.trim(),
+      val: normVal(), spec: normSpec(),
+      desc: buildDesc(name, editingSku),
+      qty: numVal($('f-qty').value, 0),
+      min: numVal($('f-min').value, 0),
+    };
     save(items); resetFormFields(); toggleForm(false); render();
     cloudPush(items[i]);
     cloudTombstone(items[i].sku, true);
@@ -480,7 +505,7 @@ $('form-add').addEventListener('submit', (e) => {
   });
   save(items); resetFormFields(); toggleForm(false); render();
   cloudPush(items[0]);
-  cloudTombstone(sku, true);
+  cloudTombstone(sku, true); // por si se había borrado antes con ese SKU
 });
 
 // Normaliza Valor/Detalle antes de leer/guardar: 100uf 25v -> 100uF 25V
@@ -611,7 +636,6 @@ async function wikiLookup(term, box) {
     s.textContent = 'Sin conexión a Wikipedia (revisá internet). Igual podés cargarlo manual.';
   }
 }
-
 ['f-name', 'f-sku', 'f-val', 'f-spec'].forEach((id) => $(id).addEventListener('input', (e) => {
   if (id === 'f-val' || id === 'f-spec') aiAuto = false; // edición manual rompe lo auto
   if (id === 'f-sku') skuAuto = false;
@@ -668,7 +692,7 @@ $('btn-cloud-on').onclick = async () => {
   if (await cloudConnect(false)) cloudPull();
 };
 $('btn-cloud-off').onclick = () => {
-  setCfg({ off: true }); SB = null; cloudOk = false; MEM = null;
+  setCfg({ off: true }); rtStop(); SB = null; cloudOk = false; MEM = null;
   cloudStatus('Desconectado. Queda lo local.');
   render();
 };
