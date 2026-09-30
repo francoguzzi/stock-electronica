@@ -403,7 +403,7 @@ const KNOWLEDGE = [
   { keys: ["ADAPTADOR SOIC", "SOIC", "PLACA ADAPTADORA"], name: "Adaptador SOIC", cat: "Insumos", desc: "Placa para pasar SMD a DIP.", pkg: "Varios", min: 2 },
 ];
 
-// Genéricos por fragmento: enganchan escritura parcial ("RESI", "CAPA", "DIOD...")
+// Genéricos por fragmento: enganchan escritura parcial ("RESI", "CAPA", "DIOD...)
 // Se buscan DESPUÉS de la base exacta, para no tapar códigos específicos.
 const GENERIC = [
   { frag: ["RESIST"], name: "Resistencia", cat: "Resistencias", desc: "Resistencia. Limita la corriente. Completá valor en ohm y potencia.", pkg: "Axial", min: 10 },
